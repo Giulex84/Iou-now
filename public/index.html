@@ -30,3 +30,90 @@
     const sdkStatus = document.getElementById('sdk_status');
     const startBtn = document.getElementById('startBtn');
     const resultBox = document.getElementById('result');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // 1) EVENT: SDK ready (this is the most reliable hook)
+    window.addEventListener('pi-sdk-ready', () => {
+      try {
+        Pi.init({ version: "2.0" });
+        sdkStatus.textContent = '✅ SDK ready';
+        startBtn.disabled = false;
+      } catch (err) {
+        sdkStatus.textContent = '❌ Init error';
+        console.error('Pi.init error', err);
+      }
+    });
+
+    // 2) Timeout fallback (if SDK not present within 5s)
+    setTimeout(() => {
+      if (typeof Pi === 'undefined') {
+        sdkStatus.textContent = '⚠️ SDK not loaded — open in Pi Browser or re-validate domain';
+        startBtn.disabled = true;
+      }
+    }, 5000);
+
+    // Clear debug
+    clearBtn.onclick = () => {
+      resultBox.textContent = '📜 Debug cleared.';
+      console.clear();
+    };
+
+    // Main flow: authenticate and request payment
+    startBtn.onclick = async () => {
+      resultBox.textContent = '⏳ Authenticating...';
+      try {
+        const scopes = ['username','payments'];
+        const auth = await Pi.authenticate(scopes, (p) => console.log('incomplete payment', p));
+        resultBox.textContent = `✅ Authenticated as @${auth.user.username}. Creating payment...`;
+
+        const payment = {
+          amount: 0.001,
+          recipient: 'GDT-test', // test recipient
+          memo: 'IOU Now test payment',
+          metadata: { app: 'IOU Now' }
+        };
+
+        await Pi.requestPayment(payment, {
+          onReadyForServerApproval: (paymentId) => {
+            resultBox.textContent = '🔄 User approved — contacting server...';
+            fetch('/api/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId })
+            })
+            .then(r => r.json())
+            .then(data => {
+              if (data && data.txid) {
+                // small delay to stabilize SDK
+                setTimeout(() => { Pi.complete(data.txid); resultBox.textContent = `🔔 Server approved — TXID: ${data.txid}`; }, 800);
+              } else {
+                Pi.cancel(paymentId);
+                resultBox.textContent = '❌ Server error or invalid response.';
+              }
+            })
+            .catch(err => {
+              Pi.cancel(paymentId);
+              resultBox.textContent = '❌ Network error while approving.';
+              console.error(err);
+            });
+          },
+          onPaymentCompleted: (txid) => {
+            resultBox.textContent = `🎉 Payment completed! TXID: ${txid}`;
+          },
+          onCancel: () => {
+            resultBox.textContent = '❌ Payment canceled by user.';
+          },
+          onError: (error) => {
+            resultBox.textContent = `❌ SDK Error: ${error && error.message ? error.message : 'Unknown'}`;
+            console.error('Pi SDK error', error);
+          }
+        });
+
+      } catch (err) {
+        resultBox.textContent = `❌ General error: ${err && err.message ? err.message : err}`;
+        console.error(err);
+      }
+    };
+  </script>
+</body>
+</html>
