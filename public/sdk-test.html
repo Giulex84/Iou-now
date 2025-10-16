@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pi SDK Check - IOU Now</title>
+  <script src="https://sdk.minepi.com/v2/sdk.js"></script>
+</head>
+<body>
+  <h2>🔍 Pi SDK Load Test</h2>
+  <div id="result">⏳ Checking Pi SDK...</div>
+
+  <script>
+    const result = document.getElementById("result");
+
+    // Step 1 — Immediate check
+    if (typeof Pi === "undefined") {
+      result.innerText = "❌ Pi is not defined immediately.";
+    } else {
+      result.innerText = "✅ Pi SDK loaded instantly.";
+    }
+
+    // Step 2 — Re-check after 3s
+    setTimeout(() => {
+      if (typeof Pi === "undefined") {
+        result.innerText = "❌ Still no Pi object after 3 seconds.";
+      } else {
+        result.innerText = "✅ Pi SDK object found after delay.";
+      }
+    }, 3000);
+
+    // Step 3 — Listen for event
+    window.addEventListener("pi-sdk-ready", () => {
+      result.innerText = "🎯 Event 'pi-sdk-ready' fired — SDK loaded properly!";
+    });
+  </script>
+</body>
+</html>
