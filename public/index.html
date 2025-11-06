@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>💎 IOU Now — Test Payment</title>
 
-  <!-- Pi SDK v2 (load by script tag) -->
-  <script src="https://sdk.minepi.com/v2/sdk.js" defer></script>
+  <script src="https://sdk.minepi.com/v2/platform.js"></script>
 
   <style>
     body { font-family: Arial, sans-serif; background:#f6f8fb; color:#222; text-align:center; padding:28px; }
@@ -32,10 +31,11 @@
     const resultBox = document.getElementById('result');
     const clearBtn = document.getElementById('clearBtn');
 
-    // 1) EVENT: SDK ready (this is the most reliable hook)
+    // 1) EVENT: SDK ready (il modo più affidabile per avviare l'SDK)
     window.addEventListener('pi-sdk-ready', () => {
       try {
-        Pi.init({ version: "2.0" });
+        // Inizializza l'SDK di Pi App Platform dopo che lo script è caricato
+        Pi.init({ version: "2.0" }); 
         sdkStatus.textContent = '✅ SDK ready';
         startBtn.disabled = false;
       } catch (err) {
@@ -44,9 +44,10 @@
       }
     });
 
-    // 2) Timeout fallback (if SDK not present within 5s)
+    // 2) Timeout fallback (se l'SDK non è presente entro 5s, mostra l'errore che vedevi tu)
     setTimeout(() => {
       if (typeof Pi === 'undefined') {
+        // Questo è il messaggio di errore che vedevi prima.
         sdkStatus.textContent = '⚠️ SDK not loaded — open in Pi Browser or re-validate domain';
         startBtn.disabled = true;
       }
@@ -76,6 +77,8 @@
         await Pi.requestPayment(payment, {
           onReadyForServerApproval: (paymentId) => {
             resultBox.textContent = '🔄 User approved — contacting server...';
+            
+            // QUI DEVI ASSICURARTI CHE IL TUO ENDPOINT /api/approve SIA FUNZIONANTE
             fetch('/api/approve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -84,7 +87,7 @@
             .then(r => r.json())
             .then(data => {
               if (data && data.txid) {
-                // small delay to stabilize SDK
+                // piccolo ritardo per stabilizzare l'SDK
                 setTimeout(() => { Pi.complete(data.txid); resultBox.textContent = `🔔 Server approved — TXID: ${data.txid}`; }, 800);
               } else {
                 Pi.cancel(paymentId);
