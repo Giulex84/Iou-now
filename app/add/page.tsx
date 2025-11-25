@@ -1,6 +1,7 @@
 "use client"
 
 import AddIOUForm from "@/components/add-iou-form"
+import StartPaymentButton from "@/components/StartPaymentButton"
 
 export default function AddPage() {
   return (
@@ -11,6 +12,11 @@ export default function AddPage() {
           Record a new IOU with category and currency.
         </p>
       </div>
+
+      <div className="flex justify-end">
+        <StartPaymentButton amount={1} />
+      </div>
+
       <AddIOUForm />
     </div>
   )
