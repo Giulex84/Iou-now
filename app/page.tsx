@@ -3,10 +3,8 @@
 import { useState } from "react"
 import { useIOUs } from "@/components/iou-context"
 import IOUCard from "@/components/iou-card"
+import StartPaymentButton from "@/components/StartPaymentButton"   // <── AGGIUNTO
 import type { IOUCurrency } from "@/lib/types"
-
-// 👉 AGGIUNTO QUI
-import StartPaymentButton from "@/components/StartPaymentButton"
 
 type CurrencyFilter = IOUCurrency | "ALL"
 
@@ -60,29 +58,25 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
+      
+      {/* Header */}
       <div className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          IOU Ledger Pro
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">IOU Ledger Pro</h1>
         <p className="mt-1 text-sm text-gray-500">
           Track who owes what, across currencies.
         </p>
+
+        {/* 🔥 START PAYMENT BUTTON INSERITO QUI */}
+        <div className="mt-3">
+          <StartPaymentButton iouId={"test-iou"} amount={1} />
+        </div>
       </div>
 
-      {/* 👉 AGGIUNTO: PULSANTE PER TESTARE I PAGAMENTI */}
-      <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl">
-        <p className="text-xs text-purple-700 mb-2">
-          Test Pi Payment (required to pass checklist step 10)
-        </p>
-        <StartPaymentButton ioud="test-payment" amount={1} />
-      </div>
-
+      {/* Search + Filters */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <label className="sr-only" htmlFor="search">
-              Search IOUs
-            </label>
+            <label className="sr-only" htmlFor="search">Search IOUs</label>
             <div className="relative">
               <input
                 id="search"
@@ -95,6 +89,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Filters */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2 text-[11px]">
             <button
@@ -143,6 +138,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Summary */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-2xl border border-emerald-100 shadow-sm">
           <p className="text-xs font-medium text-emerald-700 mb-1">Owed to Me</p>
@@ -165,19 +161,24 @@ export default function Home() {
         </div>
       </div>
 
+      {/* IOU List */}
       <div>
         <div className="flex items-baseline justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-900">Active IOUs</h2>
           <p className="text-xs text-gray-500">{totalCount} items</p>
         </div>
+
         <div className="space-y-3 pb-4">
           {filteredActive.map((iou) => (
             <IOUCard key={iou.id} iou={iou} />
           ))}
+
           {filteredActive.length === 0 && (
             <div className="text-center py-10 text-gray-400">
               <p className="text-sm font-medium">No active IOUs</p>
-              <p className="text-xs mt-1">Try changing filters or add a new IOU.</p>
+              <p className="text-xs mt-1">
+                Try changing filters or add a new IOU.
+              </p>
             </div>
           )}
         </div>
