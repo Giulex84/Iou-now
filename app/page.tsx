@@ -5,6 +5,9 @@ import { useIOUs } from "@/components/iou-context"
 import IOUCard from "@/components/iou-card"
 import type { IOUCurrency } from "@/lib/types"
 
+// 👉 AGGIUNTO QUI
+import StartPaymentButton from "@/components/StartPaymentButton"
+
 type CurrencyFilter = IOUCurrency | "ALL"
 
 export default function Home() {
@@ -58,8 +61,20 @@ export default function Home() {
   return (
     <div className="space-y-6">
       <div className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">IOU Ledger Pro</h1>
-        <p className="mt-1 text-sm text-gray-500">Track who owes what, across currencies.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          IOU Ledger Pro
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Track who owes what, across currencies.
+        </p>
+      </div>
+
+      {/* 👉 AGGIUNTO: PULSANTE PER TESTARE I PAGAMENTI */}
+      <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl">
+        <p className="text-xs text-purple-700 mb-2">
+          Test Pi Payment (required to pass checklist step 10)
+        </p>
+        <StartPaymentButton ioud="test-payment" amount={1} />
       </div>
 
       <div className="space-y-3">
