@@ -15,7 +15,7 @@ export default function StartPaymentButton({ iouId, amount = 1 }) {
     setLoading(true);
 
     try {
-      console.log("▶ Starting payment...");
+      console.log("👉 Starting Pi payment…");
 
       // 1️⃣ CREATE SERVER PAYMENT
       const initiateRes = await fetch("/api/pi/initiate-payment", {
@@ -40,63 +40,41 @@ export default function StartPaymentButton({ iouId, amount = 1 }) {
         amount,
         memo: `Payment for IOU ${iouId}`,
         metadata: { serverPaymentId },
-
-        // ➖ APPROVAL REQUIRED
         onReadyForServerApproval: async (paymentId) => {
-          console.log("APPROVAL REQUIRED:", paymentId);
-
-          const res = await fetch("/api/pi/approve-payment", {
+          const res = await fetch(`/api/pi/approve-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paymentId, serverPaymentId }),
           });
-
           const data = await res.json();
-          console.log("APPROVE RESPONSE:", data);
           if (!data.ok) throw new Error("Approve failed");
         },
-
-        // ✔ COMPLETION REQUIRED
         onReadyForServerCompletion: async (paymentId, txid) => {
-          console.log("COMPLETION REQUIRED:", paymentId, txid);
-
-          const res = await fetch("/api/pi/complete-payment", {
+          const res = await fetch(`/api/pi/complete-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paymentId, txid, serverPaymentId }),
           });
-
           const data = await res.json();
-          console.log("COMPLETE RESPONSE:", data);
           if (!data.ok) throw new Error("Complete failed");
         },
-
-        // ❌ USER CANCEL ACTION
         onCancel: async (paymentId) => {
-          console.log("USER CANCELLED:", paymentId);
-
-          await fetch("/api/pi/cancel-payment", {
+          await fetch(`/api/pi/cancel-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentId, serverPaymentId }),
+            body: JSON.stringify({ paymentId }),
           });
-
-          alert("❌ Payment cancelled.");
         },
-
-        // ❗ ANY ERROR IN SDK
         onError: (error) => {
-          console.error("PI PAYMENT ERROR:", error);
-          alert("❌ Payment error: " + error);
+          console.error("PI SDK ERROR:", error);
         },
       });
 
-      console.log("FINAL PAYMENT RESULT:", payment);
-      alert("✅ Payment completed successfully!");
-
+      console.log("PAYMENT FINISHED", payment);
+      alert("Payment completed!");
     } catch (err) {
-      console.error("PAYMENT ERROR:", err);
-      alert("❌ Payment failed: " + err.message);
+      console.error(err);
+      alert(err.message || "Payment failed");
     }
 
     setLoading(false);
@@ -104,12 +82,11 @@ export default function StartPaymentButton({ iouId, amount = 1 }) {
 
   return (
     <button
-      className="btn-primary"
-      disabled={loading}
       onClick={startPayment}
-      style={{ padding: "10px 18px", fontSize: "0.9rem" }}
+      disabled={loading}
+      className="px-4 py-2 bg-purple-600 text-white rounded-lg"
     >
-      {loading ? "Processing..." : `Start Payment (${amount} π)`}
+      {loading ? "Processing…" : "Start Pi Payment"}
     </button>
   );
 }
