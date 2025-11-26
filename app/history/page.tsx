@@ -1,23 +1,42 @@
 "use client";
 
-import IOUList from "@/components/iou-list";
 import { useIOUs } from "@/components/iou-context";
-import TestPaymentButton from "@/components/TestPaymentButton";
+import IOUCard from "@/components/iou-card";
+import StartPaymentButton from "@/components/StartPaymentButton";
 
 export default function HistoryPage() {
   const { ious } = useIOUs();
   const paid = ious.filter((i) => i.paid);
 
   return (
-    <div className="space-y-6 p-4">
-
-      {/* TEST PAYMENT BUTTON */}
-      <div className="w-full flex justify-center mt-4">
-        <TestPaymentButton />
+    <div className="space-y-6 pt-4 pb-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          History
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          View all settled IOUs.
+        </p>
       </div>
 
-      <h1 className="text-2xl font-bold">History</h1>
-      <IOUList items={paid} />
+      <div className="flex justify-end">
+        <StartPaymentButton amount={1} />
+      </div>
+
+      <div className="space-y-3">
+        {paid.map((iou) => (
+          <IOUCard key={iou.id} iou={iou} />
+        ))}
+
+        {paid.length === 0 && (
+          <div className="text-center py-10 text-gray-400">
+            <p className="text-sm font-medium">No past IOUs</p>
+            <p className="text-xs mt-1">
+              Completed IOUs will appear here.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
