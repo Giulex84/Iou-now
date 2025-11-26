@@ -2,46 +2,48 @@
 
 export default function TermsPage() {
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Terms of Service</h1>
-      <p className="mb-4">
-        These Terms govern your use of this application. By accessing the app, you agree to the following conditions.
-      </p>
+    <div className="p-6 space-y-6 prose">
+      <h1 className="text-3xl font-bold">Terms of Service</h1>
 
-      <h2 className="text-xl font-semibold mt-6 mb-2">1. Use of the App</h2>
-      <p className="mb-4">
-        You may use the app to track IOUs and, when available, execute Pi transactions through the Pi SDK.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">2. User Responsibilities</h2>
-      <p className="mb-4">
-        You are responsible for the accuracy of data you enter, including IOU details and transaction information.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">3. Pi Payments</h2>
-      <p className="mb-4">
-        Payments executed via the Pi SDK are final. The app does not control or reverse Pi blockchain operations.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">4. No Financial Liability</h2>
-      <p className="mb-4">
-        The app does not provide financial advice and is not responsible for losses, disputes, or errors between users.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">5. Data Storage</h2>
-      <p className="mb-4">
-        IOUs and user data may be stored in Firebase. You are responsible for safeguarding your account.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">6. Termination</h2>
-      <p className="mb-4">
-        We may suspend access in case of abuse, misuse, or violations of these terms.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-6 mb-2">7. Changes to Terms</h2>
       <p>
-        We may update these Terms at any time. Continued use of the app implies acceptance of the updated Terms.
+        Utilizzando IOU Ledger Pro accetti i presenti Termini di Servizio. Se
+        non accetti, non utilizzare l’app.
       </p>
+
+      <h2>Uso Consentito</h2>
+      <ul>
+        <li>L’app deve essere usata per registrare IOU personali.</li>
+        <li>È vietato un uso illecito o fraudolento.</li>
+        <li>L’utente è responsabile delle informazioni inserite.</li>
+      </ul>
+
+      <h2>Limitazioni</h2>
+      <ul>
+        <li>
+          L’app non è responsabile per la perdita di dati derivante da utilizzo
+          improprio.
+        </li>
+        <li>
+          Nessuna garanzia viene fornita sulla disponibilità continua del
+          servizio.
+        </li>
+      </ul>
+
+      <h2>Pagamenti</h2>
+      <p>
+        Eventuali funzioni premium o pagamenti Pi vengono gestiti esclusivamente
+        tramite i sistemi ufficiali della Pi Network. L’app non memorizza dati
+        bancari.
+      </p>
+
+      <h2>Modifiche ai Termini</h2>
+      <p>
+        I Termini possono essere aggiornati in qualsiasi momento. Continuando a
+        usare l’app, accetti tali modifiche.
+      </p>
+
+      <h2>Contatti</h2>
+      <p>Email: support@iouledger.app</p>
     </div>
   );
 }
