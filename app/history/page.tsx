@@ -11,16 +11,12 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6 pt-4 pb-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          History
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          View all settled IOUs.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">History</h1>
+        <p className="mt-1 text-sm text-gray-500">View all settled IOUs.</p>
       </div>
 
       <div className="flex justify-end">
-        <StartPaymentButton amount={1} />
+        <StartPaymentButton />
       </div>
 
       <div className="space-y-3">
@@ -29,12 +25,9 @@ export default function HistoryPage() {
         ))}
 
         {paid.length === 0 && (
-          <div className="text-center py-10 text-gray-400">
-            <p className="text-sm font-medium">No past IOUs</p>
-            <p className="text-xs mt-1">
-              Completed IOUs will appear here.
-            </p>
-          </div>
+          <p className="text-center py-10 text-gray-400 text-sm font-medium">
+            No past IOUs — completed IOUs will appear here.
+          </p>
         )}
       </div>
     </div>
