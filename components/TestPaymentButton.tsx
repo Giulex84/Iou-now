@@ -1,26 +1,30 @@
 "use client";
-import React from "react";
+
+import { Pi } from "@pi-network/pi-sdk";
 
 export default function TestPaymentButton() {
-  const handlePay = async () => {
+  const handlePayment = async () => {
     try {
-      const payment = await window.Pi.createPayment({
+      const payment = await Pi.createPayment({
         amount: 1,
-        memo: "Test payment for Pi checklist",
-        metadata: { purpose: "checklist" },
+        memo: "Test Payment",
+        metadata: { type: "test-payment" },
       });
-      console.log("Payment created:", payment);
-    } catch (error) {
-      console.error("Payment error:", error);
+
+      console.log("Payment success:", payment);
+      alert("Pagato con successo!");
+    } catch (err) {
+      console.error("Payment failed:", err);
+      alert("Errore pagamento");
     }
   };
 
   return (
     <button
-      className="px-4 py-2 bg-purple-600 text-white rounded-xl"
-      onClick={handlePay}
+      onClick={handlePayment}
+      className="px-4 py-2 bg-purple-600 text-white rounded-xl shadow"
     >
-      Pay 1π (Checklist Test)
+      Test Payment
     </button>
   );
 }
