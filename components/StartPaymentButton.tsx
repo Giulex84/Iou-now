@@ -23,20 +23,20 @@ export default function StartPaymentButton() {
           setStatus("SDK Pronto");
         } catch (err: any) {
           setSdkReady(true);
-          setStatus("Errore inizializzazione");
+          setStatus("Errore SDK");
         }
       } else {
         setStatus("SDK non trovato");
       }
     };
 
-    const t = setTimeout(initPi, 800);
+    const t = setTimeout(initPi, 500);
     return () => clearTimeout(t);
   }, []);
 
   const handlePayment = async () => {
     if (!window.Pi) {
-      alert("PI SDK non caricato!");
+      alert("SDK Pi non disponibile");
       return;
     }
 
@@ -44,19 +44,24 @@ export default function StartPaymentButton() {
 
     const paymentData = {
       amount: 1,
-      memo: "Payment",
-      metadata: { id: "TEST123" }
+      memo: "Test Payment",
+      metadata: { id: "TEST123" },
     };
 
     const callbacks = {
-      onReadyForServerApproval: (paymentId: string) => {
+      onReadyForServerApproval(paymentId: string) {
         setStatus("In attesa approvazione server: " + paymentId);
       },
-      onReadyForServerCompletion: (paymentId: string, txid: string) => {
-        setStatus("Pagamento completato");
+      onReadyForServerCompletion(paymentId: string, txid: string) {
+        setStatus("Pagamento completato: " + txid);
+        alert("OK");
       },
-      onCancel: () => setStatus("Operazione annullata"),
-      onError: (err: any) => setStatus("Errore: " + JSON.stringify(err)),
+      onCancel() {
+        setStatus("Annullato");
+      },
+      onError(err: any) {
+        setStatus("Errore: " + JSON.stringify(err));
+      },
     };
 
     try {
@@ -67,20 +72,23 @@ export default function StartPaymentButton() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-3">
+    <div className="my-6 p-4 border-2 border-yellow-400 bg-black rounded-lg text-white max-w-md mx-auto">
+      <h3 className="text-lg font-bold text-yellow-400 mb-2">Pi Debug Panel</h3>
+      <div className="mb-4 p-2 bg-gray-900 rounded font-mono text-xs text-green-400 break-words">
+        {status}
+      </div>
+
       <button
         onClick={handlePayment}
         disabled={!sdkReady}
-        className={`w-full px-4 py-3 rounded font-bold text-lg ${
+        className={`w-full py-3 px-4 rounded font-bold text-lg ${
           sdkReady
             ? "bg-yellow-500 hover:bg-yellow-600 text-black"
-            : "bg-gray-500 text-gray-300 cursor-not-allowed"
+            : "bg-gray-600 text-gray-300 cursor-not-allowed"
         }`}
       >
-        {sdkReady ? "PAGA 1 PI" : "Caricamento SDK..."}
+        {sdkReady ? "TEST PAYMENT (1 PI)" : "Caricamento SDK..."}
       </button>
-
-      <p className="text-xs text-gray-500">{status}</p>
     </div>
   );
 }
