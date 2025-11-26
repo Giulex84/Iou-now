@@ -9,88 +9,83 @@ declare global {
 }
 
 export default function TestPaymentButton() {
-  const [status, setStatus] = useState("Inizializzazione componente…");
+  const [status, setStatus] = useState("Inizializzazione...");
   const [sdkReady, setSdkReady] = useState(false);
 
   useEffect(() => {
-    setStatus("Verifica presenza SDK Pi…");
+    setStatus("Controllo SDK...");
 
-    const init = async () => {
+    const initPi = async () => {
       if (typeof window !== "undefined" && window.Pi) {
         try {
           await window.Pi.init({ version: "2.0", sandbox: true });
           setSdkReady(true);
-          setStatus("SDK Pi pronto (sandbox)");
-        } catch (e: any) {
+          setStatus("SDK Pronto");
+        } catch (err: any) {
           setSdkReady(true);
-          setStatus("Pi init già attivo o errore: " + e.message);
+          setStatus("Init Pi completato");
         }
       } else {
-        setStatus("SDK Pi NON trovato.");
+        setStatus("SDK non trovato");
       }
     };
 
-    const t = setTimeout(init, 800);
+    const t = setTimeout(initPi, 800);
     return () => clearTimeout(t);
   }, []);
 
   const handlePayment = async () => {
     if (!window.Pi) {
-      alert("SDK non trovato");
+      alert("Pi SDK non caricato");
       return;
     }
 
-    setStatus("Avvio pagamento…");
+    setStatus("Avvio pagamento...");
 
     const paymentData = {
       amount: 1,
       memo: "Test Payment",
-      metadata: { test: true },
+      metadata: { id: "TEST123" },
     };
 
     const callbacks = {
       onReadyForServerApproval: (paymentId: string) => {
         setStatus("In attesa approvazione server: " + paymentId);
-        alert("Payment: " + paymentId);
+        alert("Approva server: " + paymentId);
       },
       onReadyForServerCompletion: (paymentId: string, txid: string) => {
-        setStatus("Completamento pagamento…");
-        alert("TXID: " + txid);
+        setStatus("Completo: " + txid);
+        alert("Pagamento completato!");
       },
-      onCancel: () => {
-        setStatus("Pagamento annullato");
-      },
-      onError: (err: any) => {
-        setStatus("Errore: " + JSON.stringify(err));
-      },
+      onCancel: () => setStatus("Annullato"),
+      onError: (err: any) => setStatus("Errore: " + JSON.stringify(err)),
     };
 
     try {
       await window.Pi.createPayment(paymentData, callbacks);
-    } catch (e: any) {
-      setStatus("Errore createPayment: " + e.message);
-      alert(e.message);
+    } catch (err: any) {
+      setStatus("Errore: " + err.message);
     }
   };
 
   return (
-    <div className="my-6 p-4 border-2 border-yellow-400 bg-gray-900 rounded-lg text-white w-full max-w-md mx-auto">
-      <h3 className="text-lg font-bold text-yellow-400 mb-2">Pi Payment Debug</h3>
+    <div className="my-6 p-4 border-2 border-yellow-400 bg-black rounded-lg text-white w-full max-w-md mx-auto">
+      <h3 className="text-lg font-bold text-yellow-400 mb-2">Pi Debug Panel</h3>
 
-      <div className="mb-4 p-2 bg-black rounded font-mono text-xs text-green-400 break-words">
-        STATUS: {status}
+      <div className="mb-4 p-2 bg-gray-950 rounded font-mono text-xs text-green-400 break-words">
+        {status}
       </div>
 
       <button
         onClick={handlePayment}
         disabled={!sdkReady}
-        className={`w-full py-3 px-4 rounded font-bold text-lg transition-colors ${
+        className={`w-full py-3 px-4 rounded font-bold text-lg ${
           sdkReady
             ? "bg-yellow-500 hover:bg-yellow-600 text-black"
-            : "bg-gray-600 text-gray-400 cursor-not-allowed"
+            : "bg-gray-600 text-gray-300 cursor-not-allowed"
         }`}
       >
-        {sdkReady ? "PAGA 1 PI (TEST)" : "Caricamento SDK…"}
+        {sdkReady ? "TEST PAYMENT (1 PI)" : "Caricamento SDK..."}
       </button>
     </div>
   );
