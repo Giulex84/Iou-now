@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-
 import DueDatePicker from "@/components/due-date-picker"
 import { useIOUs } from "@/components/iou-context"
 import type { IOUCurrency } from "@/lib/types"
@@ -12,25 +11,22 @@ export default function AddPage() {
   const { addIOU } = useIOUs()
 
   const [name, setName] = useState("")
-  const [amount, setAmount] = useState<number | "">("")
-  const [type, setType] = useState<"owed" | "owing">("owed")
+  const [amount, setAmount] = useState<number>(0)
   const [currency, setCurrency] = useState<IOUCurrency>("EUR")
+  const [category, setCategory] = useState("")
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
-  const [note, setNote] = useState("")
+  const [type, setType] = useState<"owed" | "owing">("owed")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !amount) return
 
     addIOU({
       name,
-      amount: Number(amount),
-      type,
+      amount,
       currency,
+      category,
       dueDate,
-      note,
-      paid: false,
-      category: "",
+      type,
     })
 
     router.push("/")
@@ -43,77 +39,59 @@ export default function AddPage() {
           Add IOU
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Record a new debt or credit.
+          Create a new IOU entry.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 pb-10">
-        <div>
-          <label className="text-sm font-medium">Name</label>
-          <input
-            className="w-full rounded-xl border px-3 py-2"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Person"
-          />
-        </div>
+        <input
+          className="w-full rounded-xl border border-gray-300 px-3 py-2"
+          placeholder="Person name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-        <div>
-          <label className="text-sm font-medium">Amount</label>
-          <input
-            type="number"
-            className="w-full rounded-xl border px-3 py-2"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
-            placeholder="0.00"
-          />
-        </div>
+        <input
+          type="number"
+          className="w-full rounded-xl border border-gray-300 px-3 py-2"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+        />
 
-        <div>
-          <label className="text-sm font-medium">Type</label>
-          <select
-            className="w-full rounded-xl border px-3 py-2"
-            value={type}
-            onChange={(e) => setType(e.target.value as any)}
-          >
-            <option value="owed">Owed to Me</option>
-            <option value="owing">I Owe</option>
-          </select>
-        </div>
+        <select
+          className="w-full rounded-xl border border-gray-300 px-3 py-2"
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value as IOUCurrency)}
+        >
+          <option value="EUR">Euro</option>
+          <option value="USD">USD</option>
+          <option value="PI">π</option>
+        </select>
 
-        <div>
-          <label className="text-sm font-medium">Currency</label>
-          <select
-            className="w-full rounded-xl border px-3 py-2"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value as IOUCurrency)}
-          >
-            <option value="EUR">EUR €</option>
-            <option value="USD">USD $</option>
-            <option value="PI">PI π</option>
-          </select>
-        </div>
+        <input
+          className="w-full rounded-xl border border-gray-300 px-3 py-2"
+          placeholder="Category (optional)"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
 
-        <div>
-          <label className="text-sm font-medium">Due Date</label>
-          <DueDatePicker value={dueDate} onChange={setDueDate} />
-        </div>
+        <DueDatePicker date={dueDate} setDate={setDueDate} />
 
-        <div>
-          <label className="text-sm font-medium">Note</label>
-          <textarea
-            className="w-full rounded-xl border px-3 py-2"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Optional note"
-          />
-        </div>
+        <select
+          className="w-full rounded-xl border border-gray-300 px-3 py-2"
+          value={type}
+          onChange={(e) => setType(e.target.value as "owed" | "owing")}
+        >
+          <option value="owed">Owed to me</option>
+          <option value="owing">I owe</option>
+        </select>
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-blue-600 py-2 text-white font-medium"
+          className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-bold"
         >
-          Save IOU
+          Add IOU
         </button>
       </form>
     </div>
