@@ -1,64 +1,70 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useIOUs } from "@/components/iou-context"
-import IOUCard from "@/components/iou-card"
-import type { IOUCurrency } from "@/lib/types"
-
-type CurrencyFilter = IOUCurrency | "ALL"
+import { useState } from "react";
+import { useIOUs } from "@/components/iou-context";
+import IOUCard from "@/components/iou-card";
+import TestPaymentButton from "@/components/TestPaymentButton";
+import type { IOUCurrency } from "@/lib/types";
 
 export default function Home() {
-  const { ious } = useIOUs()
+  const { ious } = useIOUs();
 
-  const [search, setSearch] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState<string>("ALL")
-  const [currencyFilter, setCurrencyFilter] = useState<CurrencyFilter>("ALL")
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [currencyFilter, setCurrencyFilter] = useState<IOUCurrency | "ALL">(
+    "ALL"
+  );
 
-  const active = ious.filter((i) => !i.paid)
-
+  const active = ious.filter((i) => !i.paid);
   const categories = Array.from(new Set(active.map((i) => i.category)))
     .filter(Boolean)
-    .sort()
+    .sort();
 
   const filteredActive = active.filter((iou) => {
     const matchesSearch =
       !search.trim() ||
-      iou.name.toLowerCase().includes(search.trim().toLowerCase())
+      iou.name.toLowerCase().includes(search.trim().toLowerCase());
 
     const matchesCategory =
-      categoryFilter === "ALL" || iou.category === categoryFilter
+      categoryFilter === "ALL" || iou.category === categoryFilter;
 
     const matchesCurrency =
-      currencyFilter === "ALL" || iou.currency === currencyFilter
+      currencyFilter === "ALL" || iou.currency === currencyFilter;
 
-    return matchesSearch && matchesCategory && matchesCurrency
-  })
+    return matchesSearch && matchesCategory && matchesCurrency;
+  });
 
   const owedToMe = filteredActive
     .filter((i) => i.type === "owed")
-    .reduce((sum, i) => sum + i.amount, 0)
+    .reduce((sum, i) => sum + i.amount, 0);
 
   const iOwe = filteredActive
     .filter((i) => i.type === "owing")
-    .reduce((sum, i) => sum + i.amount, 0)
+    .reduce((sum, i) => sum + i.amount, 0);
 
-  const totalCount = filteredActive.length
+  const totalCount = filteredActive.length;
 
-  const currencySymbol = (cur: CurrencyFilter) => {
-    if (cur === "ALL") return "€/$/π"
+  const currencySymbol = (cur: IOUCurrency | "ALL") => {
+    if (cur === "ALL") return "€/$/π";
     switch (cur) {
       case "USD":
-        return "$"
+        return "$";
       case "PI":
-        return "π"
+        return "π";
       case "EUR":
       default:
-        return "€"
+        return "€";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
+
+      {/* 🔥 Test Payment Button */}
+      <div className="w-full flex justify-center mt-4">
+        <TestPaymentButton />
+      </div>
+
       <div className="pt-4 pb-2">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           IOU Ledger Pro
@@ -113,20 +119,22 @@ export default function Home() {
           </div>
 
           <div className="flex rounded-2xl bg-gray-50 p-1 text-[11px] font-semibold">
-            {(["ALL", "EUR", "USD", "PI"] as CurrencyFilter[]).map((cur) => (
-              <button
-                key={cur}
-                type="button"
-                className={`px-2.5 py-1 rounded-xl transition-all ${
-                  currencyFilter === cur
-                    ? "bg-white shadow-sm"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-                onClick={() => setCurrencyFilter(cur)}
-              >
-                {currencySymbol(cur)}
-              </button>
-            ))}
+            {(["ALL", "EUR", "USD", "PI"] as (IOUCurrency | "ALL")[]).map(
+              (cur) => (
+                <button
+                  key={cur}
+                  type="button"
+                  className={`px-2.5 py-1 rounded-xl transition-all ${
+                    currencyFilter === cur
+                      ? "bg-white shadow-sm"
+                      : "text-gray-500 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setCurrencyFilter(cur)}
+                >
+                  {currencySymbol(cur)}
+                </button>
+              )
+            )}
           </div>
         </div>
       </div>
@@ -165,11 +173,13 @@ export default function Home() {
           {filteredActive.length === 0 && (
             <div className="text-center py-10 text-gray-400">
               <p className="text-sm font-medium">No active IOUs</p>
-              <p className="text-xs mt-1">Try changing filters or add a new IOU.</p>
+              <p className="text-xs mt-1">
+                Try changing filters or add a new IOU.
+              </p>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
-            }
+  );
+}
