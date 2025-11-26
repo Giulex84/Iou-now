@@ -16,7 +16,9 @@ export default function Home() {
 
   const active = ious.filter((i) => !i.paid)
 
-  const categories = Array.from(new Set(active.map((i) => i.category))).filter(Boolean).sort()
+  const categories = Array.from(new Set(active.map((i) => i.category)))
+    .filter(Boolean)
+    .sort()
 
   const filteredActive = active.filter((iou) => {
     const matchesSearch =
@@ -58,20 +60,26 @@ export default function Home() {
   return (
     <div className="space-y-6">
       <div className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">IOU Ledger Pro</h1>
-        <p className="mt-1 text-sm text-gray-500">Track who owes what, across currencies.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          IOU Ledger Pro
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Track who owes what, across currencies.
+        </p>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <input
-              id="search"
-              className="w-full rounded-2xl border border-gray-200 bg-white px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-transparent"
-              placeholder="Search by name or note"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                id="search"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-transparent"
+                placeholder="Search by name or note"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -129,12 +137,18 @@ export default function Home() {
           <p className="text-2xl font-bold text-emerald-900">
             {currencySymbol(currencyFilter)} {owedToMe.toFixed(2)}
           </p>
+          <p className="text-[11px] text-emerald-600 mt-1">
+            {filteredActive.filter((i) => i.type === "owed").length} active
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-2xl border border-amber-100 shadow-sm">
           <p className="text-xs font-medium text-amber-700 mb-1">I Owe</p>
           <p className="text-2xl font-bold text-amber-900">
             {currencySymbol(currencyFilter)} {iOwe.toFixed(2)}
+          </p>
+          <p className="text-[11px] text-amber-600 mt-1">
+            {filteredActive.filter((i) => i.type === "owing").length} active
           </p>
         </div>
       </div>
@@ -148,6 +162,12 @@ export default function Home() {
           {filteredActive.map((iou) => (
             <IOUCard key={iou.id} iou={iou} />
           ))}
+          {filteredActive.length === 0 && (
+            <div className="text-center py-10 text-gray-400">
+              <p className="text-sm font-medium">No active IOUs</p>
+              <p className="text-xs mt-1">Try changing filters or add a new IOU.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
