@@ -1,18 +1,24 @@
 "use client";
 
 import AddIOUForm from "@/components/add-iou-form";
-import TestPaymentButton from "@/components/TestPaymentButton";
+import StartPaymentButton from "@/components/StartPaymentButton";
 
 export default function AddPage() {
   return (
-    <div className="space-y-6 p-4">
-
-      {/* TEST PAYMENT BUTTON */}
-      <div className="w-full flex justify-center mt-4">
-        <TestPaymentButton />
+    <div className="space-y-5 pt-4 pb-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          Add IOU
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Record a new IOU with category and currency.
+        </p>
       </div>
 
-      <h1 className="text-2xl font-bold">Add New IOU</h1>
+      <div className="flex justify-end">
+        <StartPaymentButton amount={1} />
+      </div>
+
       <AddIOUForm />
     </div>
   );
