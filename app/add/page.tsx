@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import AddIOUForm from "@/components/add-iou-form"
-import StartPaymentButton from "@/components/StartPaymentButton"
+import { useState } from "react";
+import { DueDatePicker } from "@/components/due-date-picker";
 
-export default function AddPage() {
+export default function AddIOUPage() {
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+
   return (
-    <div className="space-y-5 pt-4 pb-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Add IOU</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Record a new IOU with category and currency.
-        </p>
+    <div className="p-4 space-y-4">
+      <h1 className="text-2xl font-bold">Add IOU</h1>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Due Date</label>
+        <DueDatePicker value={dueDate} onChange={setDueDate} />
       </div>
 
-      <div className="flex justify-end">
-        <StartPaymentButton amount={1} />
-      </div>
-
-      <AddIOUForm />
+      <button className="w-full bg-purple-600 text-white rounded-md px-4 py-2">
+        Add IOU
+      </button>
     </div>
-  )
+  );
 }
