@@ -1,20 +1,21 @@
-"use client";
-
 import "./globals.css";
 import { IOUProvider } from "@/components/iou-context";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "IOU Ledger Pro",
   description: "Track your IOUs easily",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="it">
+    <html lang="en">
       <body>
-        <IOUProvider>
-          {children}
-        </IOUProvider>
+        <IOUProvider>{children}</IOUProvider>
       </body>
     </html>
   );
