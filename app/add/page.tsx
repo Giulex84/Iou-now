@@ -1,21 +1,41 @@
 "use client";
 
-import AddIOUForm from "@/components/add-iou-form";
-import StartPaymentButton from "@/components/StartPaymentButton";
+import { useState } from "react";
+import { useIOUs } from "@/components/iou-context";
 
 export default function AddPage() {
+  const { addIOU } = useIOUs();
+  const [form, setForm] = useState({ from: "", to: "", amount: "" });
+
+  const submit = () => {
+    addIOU(form.from, form.to, Number(form.amount));
+    setForm({ from: "", to: "", amount: "" });
+  };
+
   return (
-    <div className="space-y-5 pt-4 pb-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Add IOU</h1>
-        <p className="mt-1 text-sm text-gray-500">Record a new IOU with category and currency.</p>
-      </div>
+    <div style={{ padding: 20 }}>
+      <h1>Add IOU</h1>
 
-      <div className="flex justify-end">
-        <StartPaymentButton />
-      </div>
+      <input
+        placeholder="From"
+        value={form.from}
+        onChange={(e) => setForm({ ...form, from: e.target.value })}
+      />
 
-      <AddIOUForm />
+      <input
+        placeholder="To"
+        value={form.to}
+        onChange={(e) => setForm({ ...form, to: e.target.value })}
+      />
+
+      <input
+        placeholder="Amount"
+        type="number"
+        value={form.amount}
+        onChange={(e) => setForm({ ...form, amount: e.target.value })}
+      />
+
+      <button onClick={submit}>Save</button>
     </div>
   );
 }
