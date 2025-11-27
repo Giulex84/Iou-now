@@ -1,25 +1,23 @@
 "use client";
 
-import PiSdkLoader from "@/components/pi/PiSdkLoader";
-import { useIOUs } from "@/components/providers/IOUProvider";
-import IOUCard from "@/components/iou-card";
+import dynamic from "next/dynamic";
+
+const HistoryContent = dynamic(
+  () => import("@/components/history-content"), 
+  { ssr: false }
+);
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default function HistoryPage() {
-  const { ious } = useIOUs();
-
   return (
-    <PiSdkLoader>
-      <main className="min-h-screen p-4 bg-gray-950 text-white">
-        <h1 className="text-3xl font-bold mb-6">Storico IOU</h1>
-        <div className="space-y-4">
-          {ious.map((iou) => (
-            <IOUCard key={iou.id} iou={iou} />
-          ))}
-        </div>
-      </main>
-    </PiSdkLoader>
+    <main className="min-h-screen p-4 bg-gray-950 text-white">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Storico IOU
+      </h1>
+
+      <HistoryContent />
+    </main>
   );
 }
