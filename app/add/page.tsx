@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import PiSdkLoader from "@/components/pi/PiSdkLoader";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 const AddContent = dynamic(
   () => import("@/components/AddContent"),
