@@ -1,25 +1,28 @@
 import "./globals.css";
-import { IOUProvider } from "@/components/iou-context";
-import Script from "next/script";
+import { Inter } from "next/font/google";
+import { Metadata } from "next";
 
-export const metadata = {
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
   title: "IOU Ledger Pro",
-  description: "Track your IOUs easily",
+  description: "Track your IOUs easily on Pi Network",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
-        <Script
-          src="https://sdk.minepi.com/pi-sdk.js"
-          strategy="beforeInteractive"
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
       </head>
-
-      <body>
-        <IOUProvider>{children}</IOUProvider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
