@@ -25,16 +25,12 @@ export default function PiDebugPanel({ sdkReady }: PiDebugPanelProps) {
       window.Pi.authenticate(
         ["username"],
         (auth: any) => setAuthData(auth),
-        (error: any) =>
-          setAuthData({
-            username: "ERRORE AUTENTICAZIONE",
-            error: error.message,
-          })
+        (err: any) =>
+          setAuthData({ username: "ERRORE AUTENTICAZIONE", error: err.message })
       );
     }
   }, [sdkReady, authData]);
 
-  const statusColor = sdkReady ? "bg-green-600" : "bg-red-600";
   const authStatus = authData?.username
     ? `Autenticato: ${authData.username}`
     : sdkReady
@@ -48,7 +44,7 @@ export default function PiDebugPanel({ sdkReady }: PiDebugPanelProps) {
       </h4>
 
       <div
-        className={`p-1 rounded mb-1 text-white flex justify-between items-center ${
+        className={`p-1 rounded mb-1 text-white flex justify-between ${
           isPiBrowser ? "bg-blue-600" : "bg-red-700"
         }`}
       >
@@ -57,10 +53,12 @@ export default function PiDebugPanel({ sdkReady }: PiDebugPanelProps) {
       </div>
 
       <div
-        className={`p-1 rounded text-white flex justify-between items-center ${statusColor}`}
+        className={`p-1 rounded text-white flex justify-between ${
+          sdkReady ? "bg-green-600" : "bg-red-600"
+        }`}
       >
         <span>SDK Status:</span>
-        <span>{sdkReady ? "✅ FOUND & READY" : "❌ NOT FOUND"}</span>
+        <span>{sdkReady ? "✅ READY" : "❌ NOT FOUND"}</span>
       </div>
 
       <p className="mt-1 text-gray-300 break-words">Auth: {authStatus}</p>
