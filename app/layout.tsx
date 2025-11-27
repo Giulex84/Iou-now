@@ -1,6 +1,6 @@
-// app/layout.tsx  (SERVER COMPONENT – nessun "use client")
-
 import "./globals.css";
+import { IOUProvider } from "@/components/iou-context";
+import Script from "next/script";
 
 export const metadata = {
   title: "IOU Ledger Pro",
@@ -11,14 +11,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Pi SDK load */}
-        <script
+        <Script
           src="https://sdk.minepi.com/pi-sdk.js"
-          integrity="sha384-8qts0jqAbKLFXrrHWlP88eCjcw0bmFUXZpGgUa7mbFkFzfA2seQhLcS6grwFzeW9"
-          crossOrigin="anonymous"
+          strategy="beforeInteractive"
         />
       </head>
-      <body>{children}</body>
+
+      <body>
+        <IOUProvider>{children}</IOUProvider>
+      </body>
     </html>
   );
 }
