@@ -1,19 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import PiSdkLoader from "@/components/pi/PiSdkLoader";
 
 export const dynamic = "force-dynamic";
 
-const HistoryContent = dynamic(
-  () => import("@/components/HistoryContent"),
+// Carichiamo TUTTO (PiSdkLoader + HistoryContent) lato client
+const HistoryPageContent = dynamic(
+  () => import("@/components/history/HistoryPageContent"), 
   { ssr: false }
 );
 
 export default function HistoryPage() {
-  return (
-    <PiSdkLoader>
-      <HistoryContent />
-    </PiSdkLoader>
-  );
+  return <HistoryPageContent />;
 }
