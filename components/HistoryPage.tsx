@@ -1,29 +1,25 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
 import HistoryContent from "@/components/HistoryContent";
+import { useState, useEffect } from "react";
 
-// IMPORTANTE:
-// Non importiamo più PiSdkLoader direttamente.
-// Lo carichiamo dinamicamente per evitare qualsiasi esecuzione SSR.
 const DynamicPiSdkLoader = dynamic(
   () => import("@/components/pi/PiSdkLoader"),
   { ssr: false }
 );
 
 export default function HistoryPage() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Garantiamo che la UI venga renderizzata SOLO sul client
   useEffect(() => {
-    setIsMounted(true);
+    setMounted(true);
   }, []);
 
-  if (!isMounted) {
+  if (!mounted) {
     return (
       <div className="min-h-screen p-4 bg-gray-900 text-white">
-        <div className="text-xl">Caricamento in corso...</div>
+        <div className="text-xl">Caricamento…</div>
       </div>
     );
   }
