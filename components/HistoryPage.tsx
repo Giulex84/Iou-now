@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import HistoryContent from "@/components/HistoryContent";
-import { useState, useEffect } from "react";
 
 const DynamicPiSdkLoader = dynamic(
   () => import("@/components/pi/PiSdkLoader"),
