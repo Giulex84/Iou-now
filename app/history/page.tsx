@@ -1,15 +1,10 @@
-"use client";
-
 import dynamic from "next/dynamic";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
-// Carichiamo TUTTO (PiSdkLoader + HistoryContent) lato client
-const HistoryPageContent = dynamic(
-  () => import("@/components/history/HistoryPageContent"), 
-  { ssr: false }
-);
+const Page = dynamic(() => import("@/components/HistoryPage"), {
+  ssr: false,
+});
 
-export default function HistoryPage() {
-  return <HistoryPageContent />;
-}
+export default Page;
