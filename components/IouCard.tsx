@@ -15,7 +15,7 @@ function getCurrencySymbol(currency: IOU["currency"]) {
   }
 }
 
-export default function IOUCard({ iou }: { iou: IOU }) {
+export default function IouCard({ iou }: { iou: IOU }) {
   const { togglePaid } = useIOUs()
 
   const symbol = getCurrencySymbol(iou.currency)
