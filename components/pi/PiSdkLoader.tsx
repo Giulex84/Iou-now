@@ -17,9 +17,9 @@ export default function PiSdkLoader({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkPi = () => {
       if (typeof window !== "undefined" && window.Pi) {
-        setSdkLoaded(true);
         try {
           window.Pi.init({ version: "2.0", sandbox: true });
+          setSdkLoaded(true);
         } catch (e) {
           console.error("Errore Pi.init:", e);
         }
@@ -34,7 +34,6 @@ export default function PiSdkLoader({ children }: { children: ReactNode }) {
   return (
     <>
       <Script src="https://sdk.minepi.com/pi-sdk.js" strategy="beforeInteractive" />
-
       <PiDebugPanel sdkReady={sdkLoaded} />
 
       {sdkLoaded ? (
