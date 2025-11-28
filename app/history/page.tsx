@@ -1,12 +1,14 @@
-"use client";
-
-import dynamic from "next/dynamic";
-
+// Disabilita completamente il prerendering
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-const Page = dynamic(() => import("@/components/HistoryPage"), {
+import dynamicImport from "next/dynamic";
+
+// Caricamento dinamico del componente con ssr OFF
+const HistoryPage = dynamicImport(() => import("@/components/HistoryPage"), {
   ssr: false,
 });
 
-export default Page;
+export default function Page() {
+  return <HistoryPage />;
+}
