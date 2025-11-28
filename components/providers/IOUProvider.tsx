@@ -1,6 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+} from "react";
 
 interface IOU {
   id: string;
@@ -27,8 +32,10 @@ export function IOUProvider({ children }: { children: ReactNode }) {
   const [ious, setIous] = useState<IOU[]>([]);
 
   const addIOU = (iou: Omit<IOU, "id">) => {
-    const newIOU: IOU = { ...iou, id: Date.now().toString() };
-    setIous((prev) => [...prev, newIOU]);
+    setIous((prev) => [
+      ...prev,
+      { ...iou, id: Date.now().toString() },
+    ]);
   };
 
   return (
