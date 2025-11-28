@@ -1,26 +1,24 @@
 "use client";
 
-import React from "react";
-import { useIOUs } from "@/components/iou-context";
-import IOUCard from "@/components/iou-card";
+import { useIOUs } from "@/components/providers/IOUProvider";
+import IOUCard from "@/components/IOUCard";
 
 export default function HistoryContent() {
   const { ious } = useIOUs();
 
-  if (!ious.length) {
+  if (ious.length === 0) {
     return (
-      <p className="text-gray-400">
-        Nessun IOU ancora registrato.
-      </p>
+      <div className="text-center text-gray-400 mt-10">
+        Nessun IOU presente nello storico.
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-4">
       {ious.map((iou) => (
         <IOUCard key={iou.id} iou={iou} />
       ))}
     </div>
   );
 }
-```0
