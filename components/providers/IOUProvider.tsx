@@ -20,6 +20,7 @@ interface IOUContextType {
 
 const IOUContext = createContext<IOUContextType | undefined>(undefined);
 
+// ✅ Hook che prima NON era esportato
 export const useIOUs = (): IOUContextType => {
   const context = useContext(IOUContext);
   if (!context) {
@@ -28,7 +29,7 @@ export const useIOUs = (): IOUContextType => {
   return context;
 };
 
-export function IOUProvider({ children }: { children: ReactNode }) {
+export default function IOUProvider({ children }: { children: ReactNode }) {
   const [ious, setIous] = useState<IOU[]>([]);
 
   const addIOU = (iou: Omit<IOU, "id">) => {
