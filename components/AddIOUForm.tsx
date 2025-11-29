@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIOUs } from "@/components/providers/IOUProvider";
+import { useIOUs } from "@/components/providers/iou-context";
 import type { IOUCurrency, IOUType } from "@/lib/types";
 
 const CATEGORIES = ["Prestito", "Cena", "Spesa", "Regalo", "Altro"] as const;
@@ -23,6 +23,7 @@ export default function AddIOUForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!name || !amount) return;
 
     await addIOU({
@@ -44,22 +45,28 @@ export default function AddIOUForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Owed / Owing */}
+      {/* TYPE */}
       <div className="flex gap-2 rounded-2xl bg-gray-50 p-1">
         <button
           type="button"
           className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            type === "owed" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-600 hover:bg-gray-100"
+            type === "owed"
+              ? "bg-emerald-500 text-white shadow-sm"
+              : "bg-gray-500 text-gray-600 hover:bg-gray-100"
           }`}
           onClick={() => setType("owed")}
         >
-          I Owe <span className="font-black">me</span>
+          <span className="font-black">me</span>
+          <br />
+          they owe <span className="font-black">me</span>
         </button>
 
         <button
           type="button"
           className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            type === "owing" ? "bg-amber-500 text-white shadow-sm" : "text-gray-600 hover:bg-gray-100"
+            type === "owing"
+              ? "bg-amber-500 text-white shadow-sm"
+              : "bg-gray-500 text-gray-600 hover:bg-gray-100"
           }`}
           onClick={() => setType("owing")}
         >
@@ -67,7 +74,7 @@ export default function AddIOUForm() {
         </button>
       </div>
 
-      {/* Name */}
+      {/* NAME */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Name</label>
         <input
@@ -78,7 +85,7 @@ export default function AddIOUForm() {
         />
       </div>
 
-      {/* Amount */}
+      {/* AMOUNT + CATEGORY */}
       <div className="grid grid-cols-[2fr,1.4fr] gap-3">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Amount</label>
@@ -92,7 +99,7 @@ export default function AddIOUForm() {
           />
         </div>
 
-        {/* Currency */}
+        {/* CURRENCY */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Currency</label>
           <div className="flex rounded-xl bg-gray-50 p-1 text-xs font-semibold">
@@ -101,7 +108,9 @@ export default function AddIOUForm() {
                 key={cur}
                 type="button"
                 className={`flex-1 py-1.5 rounded-lg transition-all ${
-                  currency === cur ? "bg-white shadow-sm" : "text-gray-500 hover:bg-gray-100"
+                  currency === cur
+                    ? "bg-white shadow-sm text-gray-900"
+                    : "text-gray-500 hover:bg-gray-100"
                 }`}
                 onClick={() => setCurrency(cur)}
               >
@@ -112,7 +121,7 @@ export default function AddIOUForm() {
         </div>
       </div>
 
-      {/* Category */}
+      {/* CATEGORY */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Category</label>
         <div className="flex flex-wrap gap-2">
@@ -133,6 +142,7 @@ export default function AddIOUForm() {
         </div>
       </div>
 
+      {/* SUBMIT */}
       <button
         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold text-sm tracking-wide shadow-md shadow-blue-500/20 transition-all"
       >
