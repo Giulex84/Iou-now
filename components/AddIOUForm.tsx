@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIOUs } from "@/components/providers/iou-context";
+import { useIOUs } from "@/components/providers/IOUProvider";
 import type { IOUCurrency, IOUType } from "@/lib/types";
 
 const CATEGORIES = ["Prestito", "Cena", "Spesa", "Regalo", "Altro"] as const;
