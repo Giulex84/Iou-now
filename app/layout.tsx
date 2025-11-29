@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { IOUProvider } from "@/components/providers/IOUProvider";
+import IOUProvider from "@/components/providers/IOUProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
