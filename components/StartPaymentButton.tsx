@@ -1,65 +1,24 @@
+// components/StartPaymentButton.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
-
-declare global {
-  interface Window {
-    Pi: any;
-  }
-}
-
-type PiUser = {
-  uid: string;
-  username: string;
-};
+import React, { useState } from "react";
+import { usePi } from "@/components/PiProvider";
 
 export default function StartPaymentButton() {
-  const [status, setStatus] = useState<string>("Inizializzazione...");
-  const [sdkReady, setSdkReady] = useState<boolean>(false);
-  const [user, setUser] = useState<PiUser | null>(null);
+  const { Pi, user, initialized } = usePi();
+  const [status, setStatus] = useState<string>("Pronto per il test payment.");
   const [serverPaymentId, setServerPaymentId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    const init = async () => {
-      if (typeof window === "undefined" || !window.Pi) {
-        setStatus("SDK Pi non trovato. Apri in Pi Browser.");
-        return;
-      }
-
-      try {
-        await window.Pi.init({
-          version: "2.0",
-          sandbox: true,
-        });
-
-        const scopes = ["payments"];
-
-        const authUser = await window.Pi.authenticate(
-          scopes,
-          (incompletePayment: any) => {
-            console.log("Incomplete Payment:", incompletePayment);
-          }
-        );
-
-        setUser(authUser);
-        setSdkReady(true);
-        setStatus("SDK pronto.");
-      } catch (err) {
-        console.error(err);
-        setStatus("Errore init/auth");
-      }
-    };
-
-    init();
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
-    if (!window.Pi) return;
+    if (!Pi) {
+      setStatus("Pi SDK non disponibile. Apri in Pi Browser.");
+      return;
+    }
 
     try {
       setIsLoading(true);
-      setStatus("Creo pagamento lato server...");
+      setStatus("Creo pagamento sul server...");
 
       const initRes = await fetch("/api/pi/initiate-payment", {
         method: "POST",
@@ -79,7 +38,7 @@ export default function StartPaymentButton() {
         return;
       }
 
-      const newServerPaymentId = initJson.serverPaymentId;
+      const newServerPaymentId: string = initJson.serverPaymentId;
       setServerPaymentId(newServerPaymentId);
 
       const paymentData = {
@@ -90,7 +49,7 @@ export default function StartPaymentButton() {
 
       const callbacks = {
         onReadyForServerApproval: async (paymentId: string) => {
-          setStatus("Attesa approvazione...");
+          setStatus("Attesa approvazione server...");
 
           const res = await fetch("/api/pi/approve-payment", {
             method: "POST",
@@ -102,12 +61,15 @@ export default function StartPaymentButton() {
           });
 
           const json = await res.json();
-          if (!res.ok || !json.ok) setStatus("Errore approvazione");
-          else setStatus("Approvato. Attesa completamento...");
+          if (!res.ok || !json.ok) {
+            setStatus("Errore approvazione server");
+          } else {
+            setStatus("Approvato. Attesa completamento su Pi...");
+          }
         },
 
         onReadyForServerCompletion: async (paymentId: string, txid: string) => {
-          setStatus("Completamento...");
+          setStatus("Completamento sul server...");
 
           const res = await fetch("/api/pi/complete-payment", {
             method: "POST",
@@ -120,9 +82,10 @@ export default function StartPaymentButton() {
           });
 
           const json = await res.json();
-          if (!res.ok || !json.ok) setStatus("Errore completion");
-          else {
-            setStatus("Pagamento completato");
+          if (!res.ok || !json.ok) {
+            setStatus("Errore completamento server");
+          } else {
+            setStatus("Pagamento completato ✅");
             alert("Pagamento di test completato!");
           }
 
@@ -130,24 +93,26 @@ export default function StartPaymentButton() {
         },
 
         onCancel: () => {
-          setStatus("Annullato");
+          setStatus("Pagamento annullato dall'utente");
           setIsLoading(false);
         },
 
         onError: (err: any) => {
-          console.error(err);
+          console.error("Pi payment error", err);
           setStatus("Errore pagamento");
           setIsLoading(false);
         },
       };
 
-      await window.Pi.createPayment(paymentData, callbacks);
-    } catch (err) {
-      console.error(err);
-      setStatus("Errore");
+      await Pi.createPayment(paymentData, callbacks);
+    } catch (err: any) {
+      console.error("handlePayment error", err);
+      setStatus("Errore: " + (err?.message ?? "sconosciuto"));
       setIsLoading(false);
     }
   };
+
+  const disabled = !initialized || !Pi || isLoading;
 
   return (
     <div className="my-6 p-4 border-2 border-yellow-400 bg-black rounded-lg text-white max-w-md mx-auto">
@@ -172,14 +137,18 @@ export default function StartPaymentButton() {
 
       <button
         onClick={handlePayment}
-        disabled={!sdkReady || isLoading}
+        disabled={disabled}
         className={`w-full py-3 px-4 rounded font-bold text-lg ${
-          !sdkReady || isLoading
+          disabled
             ? "bg-gray-600 text-gray-300 cursor-not-allowed"
             : "bg-yellow-500 hover:bg-yellow-600 text-black"
         }`}
       >
-        {sdkReady ? (isLoading ? "In corso..." : "TEST PAYMENT (1 π)") : "Caricamento..."}
+        {isLoading
+          ? "In corso..."
+          : initialized
+          ? "TEST PAYMENT (1 π)"
+          : "Inizializzazione..."}
       </button>
     </div>
   );
