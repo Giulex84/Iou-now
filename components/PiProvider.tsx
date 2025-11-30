@@ -1,53 +1,71 @@
+// components/PiProvider.tsx
 "use client";
 
-import { useEffect, useState, createContext, useContext } from "react";
+import { useEffect, useState, createContext, useContext, type ReactNode } from "react";
 
 declare global {
   interface Window {
-    Pi: any;
+    Pi?: any;
   }
 }
 
 interface PiContextValue {
-  Pi: any;
-  user: any;
+  Pi: any | null;
+  user: any | null;
+  initialized: boolean;
 }
 
 const PiContext = createContext<PiContextValue>({
   Pi: null,
   user: null,
+  initialized: false,
 });
 
-export default function PiProvider({ children }: { children: React.ReactNode }) {
-  const [pi, setPi] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+export default function PiProvider({ children }: { children: ReactNode }) {
+  const [pi, setPi] = useState<any | null>(null);
+  const [user, useUser] = useState<any | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Load Pi SDK script
+    if (typeof window === "undefined") return;
+
+    const setupPi = async () => {
+      if (!window.Pi) return;
+
+      window.Pi.init({
+        version: "2.0",
+        sandbox: true,
+      });
+
+      try {
+        const scopes = ["payments"];
+        window.Pi.authenticate(scopes, (authResult: any) => {
+          useUser(authResult ? authResult.user : null);
+        });
+      } catch (err) {
+        console.error("Pi authenticate error", err);
+      }
+
+      setPi(window.Pi);
+      setInitialized(true);
+    };
+
+    if (window.Pi) {
+      setupPi();
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://sdk.minepi.com/pi-sdk.js";
     script.async = true;
     script.onload = () => {
-      if (!window.Pi) return;
-
-      // Init Pi SDK
-      window.Pi.init({
-        version: "2.0",
-      });
-
-      setPi(window.Pi);
-
-      // Auto-login on open
-      window.Pi.authenticate(["username", "payments"], (authResult: any) => {
-        setUser(authResult ? authResult.user : null);
-      });
+      setupPi();
     };
-
     document.head.appendChild(script);
   }, []);
 
   return (
-    <PiContext.Provider value={{ Pi: pi, user }}>
+    <PiContext.Provider value={{ Pi: pi, user, initialized }}>
       {children}
     </PiContext.Provider>
   );
