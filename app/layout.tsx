@@ -1,6 +1,5 @@
 // app/layout.tsx
 import "./globals.css";
-import IOUProvider from "@/components/providers/IOUProvider";
 import PiProvider from "@/components/PiProvider";
 
 export const metadata = {
@@ -13,9 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <PiProvider>
-          <IOUProvider>
-            {children}
-          </IOUProvider>
+          {children}
         </PiProvider>
       </body>
     </html>
