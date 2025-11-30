@@ -1,33 +1,19 @@
+// app/layout.tsx
 import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import PiProvider from "@/components/PiProvider";
 
-import IOUProvider from "@/components/providers/IOUProvider";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "IOU Ledger Pro",
-  description: "Track your IOUs easily on Pi Network",
+export const metadata = {
+  title: "IOU Now",
+  description: "Manage your IOUs with Pi Network",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-      </head>
-      <body className={inter.className}>
-        <IOUProvider>
+      <body>
+        <PiProvider>
           {children}
-        </IOUProvider>
+        </PiProvider>
       </body>
     </html>
   );
