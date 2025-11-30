@@ -1,14 +1,15 @@
-"use client";
-
-import AddIOUForm from "@/components/AddIOUForm";
-
+// app/page.tsx
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
-export default function AddPage() {
+import DashboardContent from "@/components/DashboardContent";
+import StartPaymentButton from "@/components/StartPaymentButton";
+
+export default function Page() {
   return (
     <div className="min-h-screen p-4 bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-6">Aggiungi IOU</h1>
-      <AddIOUForm />
+      <DashboardContent />
+      <StartPaymentButton />
     </div>
   );
 }
