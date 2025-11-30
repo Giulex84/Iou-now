@@ -2,7 +2,13 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 import DashboardContent from "@/components/DashboardContent";
+import StartPaymentButton from "@/components/StartPaymentButton";
 
 export default function Page() {
-  return <DashboardContent />;
+  return (
+    <div className="min-h-screen p-4 bg-gray-900 text-white">
+      <DashboardContent />
+      <StartPaymentButton />
+    </div>
+  );
 }
