@@ -1,0 +1,3 @@
+{
+  "buildCommand": "pnpm install @supabase/supabase-js && pnpm run build"
+}
