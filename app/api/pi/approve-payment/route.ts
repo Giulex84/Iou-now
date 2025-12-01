@@ -1,35 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { paymentId } = await req.json();
-
-    const apiKey = process.env.PI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ ok: false, error: "PI_API_KEY missing" }, { status: 500 });
-    }
+    const { paymentId, serverPaymentId } = await req.json();
 
     if (!paymentId) {
-      return NextResponse.json({ ok: false, error: "paymentId required" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "paymentId required" },
+        { status: 400 }
+      );
     }
 
-    const res = await fetch(`https://sandbox-api.minepi.com/v2/payments/${paymentId}/approve`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Key ${apiKey}`,
-      }
-    });
+    // Qui potresti salvare su DB (opzionale)
+    console.log("APPROVED:", { paymentId, serverPaymentId });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json({ ok: false, error: data }, { status: 500 });
-    }
-
-    return NextResponse.json({ ok: true, payment: data });
-
+    return NextResponse.json({ ok: true });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
