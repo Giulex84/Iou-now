@@ -4,34 +4,36 @@ import { useState } from "react";
 import { useIOUS } from "@/components/providers/IOUProvider";
 
 const CATEGORIES = ["Prestito", "Cena", "Spesa", "Regalo", "Altro"] as const;
-const CURRENCY_LABELS = { EUR: "€ Euro", USD: "$ Dollar", PI: "π Pi" };
+const CURRENCY_LABELS = { EUR: "€ Euro", USD: "$ Dollar", PI: "π Pi" } as const;
 
 export default function AddIOUForm() {
-  const { addIOU } = useIOUS();
+  const { addIou } = useIOUS();
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
-  const [type, setType] = useState<"owed" | "owing">("owed");
+  const [type, setType] = useState<"credit" | "debit">("credit"); // FIX
   const [category, setCategory] = useState<string>("Prestito");
   const [currency, setCurrency] = useState<"EUR" | "USD" | "PI">("EUR");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!name || !amount) return;
 
-    addIOU({
+    await addIou({
       name,
       amount: Number(amount),
-      date: new Date().toISOString(),
-      paid: false,
-      type,
-      category,
       currency,
+      category,
+      type,                 // ORA È CORRETTO
+      paid: false,
+      date: new Date().toISOString(),
     });
 
+    // Reset campi
     setName("");
     setAmount("");
-    setType("owed");
+    setType("credit");
     setCategory("Prestito");
     setCurrency("EUR");
   }
@@ -44,11 +46,11 @@ export default function AddIOUForm() {
         <button
           type="button"
           className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-            type === "owed"
+            type === "credit"
               ? "bg-emerald-500 text-white shadow"
               : "bg-gray-600 text-gray-300"
           }`}
-          onClick={() => setType("owed")}
+          onClick={() => setType("credit")}
         >
           <span className="font-black">me</span>
           <br />they owe me
@@ -57,11 +59,11 @@ export default function AddIOUForm() {
         <button
           type="button"
           className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-            type === "owing"
+            type === "debit"
               ? "bg-orange-500 text-white shadow"
               : "bg-gray-600 text-gray-300"
           }`}
-          onClick={() => setType("owing")}
+          onClick={() => setType("debit")}
         >
           <span className="font-black">I owe them</span>
         </button>
@@ -72,7 +74,8 @@ export default function AddIOUForm() {
         <label className="text-sm font-medium text-gray-300">Name</label>
         <input
           type="text"
-          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
+                     focus:ring-2 focus:ring-blue-500"
           placeholder="Person or contact name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -85,8 +88,9 @@ export default function AddIOUForm() {
         <input
           type="number"
           step="0.01"
-          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
           placeholder="0.00"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
+                     focus:ring-blue-500 focus:ring-2"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
