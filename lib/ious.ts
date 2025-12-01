@@ -1,14 +1,15 @@
+// lib/ious.ts
 import { supabase } from "./supabase";
 import type { IOU } from "./types";
 
 // ------------------------------
-// CREATE IOU
+// CREA IOU
 // ------------------------------
-export async function addIou(iou: IOU) {
+export async function addIou(iou: Omit<IOU, "id">): Promise<IOU> {
   const { data, error } = await supabase
     .from("ious")
     .insert(iou)
-    .select()
+    .select("*")
     .single();
 
   if (error) {
@@ -16,13 +17,17 @@ export async function addIou(iou: IOU) {
     throw error;
   }
 
-  return data;
+  // amount potrebbe tornare come stringa -> forziamo number
+  return {
+    ...data,
+    amount: Number(data.amount),
+  } as IOU;
 }
 
 // ------------------------------
-// GET ALL IOU
+// LEGGI TUTTI GLI IOU
 // ------------------------------
-export async function getIous() {
+export async function getIous(): Promise<IOU[]> {
   const { data, error } = await supabase
     .from("ious")
     .select("*")
@@ -33,18 +38,24 @@ export async function getIous() {
     throw error;
   }
 
-  return data;
+  return (data ?? []).map((row) => ({
+    ...row,
+    amount: Number(row.amount),
+  })) as IOU[];
 }
 
 // ------------------------------
-// UPDATE IOU
+// AGGIORNA UN IOU
 // ------------------------------
-export async function updateIou(id: string, updates: Partial<IOU>) {
+export async function updateIou(
+  id: string,
+  updates: Partial<IOU>
+): Promise<IOU> {
   const { data, error } = await supabase
     .from("ious")
     .update(updates)
     .eq("id", id)
-    .select()
+    .select("*")
     .single();
 
   if (error) {
@@ -52,17 +63,17 @@ export async function updateIou(id: string, updates: Partial<IOU>) {
     throw error;
   }
 
-  return data;
+  return {
+    ...data,
+    amount: Number(data.amount),
+  } as IOU;
 }
 
 // ------------------------------
-// DELETE IOU
+// ELIMINA UN IOU
 // ------------------------------
-export async function deleteIou(id: string) {
-  const { error } = await supabase
-    .from("ious")
-    .delete()
-    .eq("id", id);
+export async function deleteIou(id: string): Promise<boolean> {
+  const { error } = await supabase.from("ious").delete().eq("id", id);
 
   if (error) {
     console.error("Errore Supabase (deleteIou):", error.message);
