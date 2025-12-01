@@ -1,43 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../lib/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { iouId, amount, memo, metadata } = body || {};
+    const { amount, memo, metadata } = await req.json();
 
-    if (!iouId || typeof amount !== "number") {
+    const apiKey = process.env.PI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json(
-        { ok: false, error: "iouId and amount are required." },
-        { status: 400 }
+        { error: "PI_API_KEY missing" },
+        { status: 500 }
       );
     }
 
-    const ref = collection(db, "pi_payments");
-    const docRef = await addDoc(ref, {
-      iouId,
-      amount,
-      memo: memo || `IOU payment for ${iouId}`,
-      metadata: metadata || {},
-      status: "INITIATED",
-      network: "Pi Testnet",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+    const res = await fetch("https://sandbox-api.minepi.com/v2/payments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Key ${apiKey}`,
+      },
+      body: JSON.stringify({
+        amount,
+        memo,
+        metadata,
+      }),
     });
 
-    return NextResponse.json({
-      ok: true,
-      serverPaymentId: docRef.id,
-    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Pi API error", details: data },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data);
   } catch (err: any) {
-    console.error("initiate-payment error:", err);
     return NextResponse.json(
-      { ok: false, error: err?.message || "Internal server error." },
+      { error: "Server error", details: err.message },
       { status: 500 }
     );
   }
