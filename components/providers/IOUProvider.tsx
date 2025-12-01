@@ -3,55 +3,99 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useState,
   ReactNode,
 } from "react";
+import type { IOU } from "@/lib/types";
+import {
+  addIou as addIouToDb,
+  getIous as getIousFromDb,
+  updateIou as updateIouInDb,
+  deleteIou as deleteIouFromDb,
+} from "@/lib/ious";
 
-export interface IOU {
-  id: string;
-  name: string;
-  amount: number;
-  date: string;
-  paid: boolean;
-  type: "owed" | "owing";
-  category: string;
-  currency: "EUR" | "USD" | "PI";
-}
-
-interface IOUContextType {
+type IOUContextType = {
   ious: IOU[];
-  addIOU: (iou: Omit<IOU, "id">) => void;
-  togglePaid: (id: string) => void;
-}
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+  addIou: (iou: Omit<IOU, "id">) => Promise<void>;
+  togglePaid: (id: string, paid: boolean) => Promise<void>;
+  removeIou: (id: string) => Promise<void>;
+};
 
 const IOUContext = createContext<IOUContextType | undefined>(undefined);
 
-export const useIOUS = (): IOUContextType => {
+// Hook da usare nei componenti (Add page, History, IouCard ecc.)
+export function useIOUs(): IOUContextType {
   const ctx = useContext(IOUContext);
-  if (!ctx) throw new Error("useIOUS must be used inside IOUProvider");
+  if (!ctx) {
+    throw new Error("useIOUs deve essere usato dentro IOUProvider");
+  }
   return ctx;
-};
+}
 
 export default function IOUProvider({ children }: { children: ReactNode }) {
   const [ious, setIous] = useState<IOU[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addIOU = (iou: Omit<IOU, "id">) => {
-    setIous((prev) => [
-      ...prev,
-      { ...iou, id: Date.now().toString() },
-    ]);
+  // Carica inizialmente tutti gli IOU
+  const refresh = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getIousFromDb();
+      setIous(data);
+    } catch (err: any) {
+      setError(err.message ?? "Errore caricamento IOUs");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const togglePaid = (id: string) => {
-    setIous((prev) =>
-      prev.map((iou) =>
-        iou.id === id ? { ...iou, paid: !iou.paid } : iou
-      )
-    );
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const addIou = async (iou: Omit<IOU, "id">) => {
+    try {
+      setError(null);
+      const saved = await addIouToDb(iou);
+      setIous((prev) => [saved, ...prev]);
+    } catch (err: any) {
+      setError(err.message ?? "Errore creazione IOU");
+      throw err;
+    }
+  };
+
+  const togglePaid = async (id: string, paid: boolean) => {
+    try {
+      setError(null);
+      const updated = await updateIouInDb(id, { paid });
+      setIous((prev) => prev.map((i) => (i.id === id ? updated : i)));
+    } catch (err: any) {
+      setError(err.message ?? "Errore aggiornamento IOU");
+      throw err;
+    }
+  };
+
+  const removeIou = async (id: string) => {
+    try {
+      setError(null);
+      await deleteIouFromDb(id);
+      setIous((prev) => prev.filter((i) => i.id !== id));
+    } catch (err: any) {
+      setError(err.message ?? "Errore eliminazione IOU");
+      throw err;
+    }
   };
 
   return (
-    <IOUContext.Provider value={{ ious, addIOU, togglePaid }}>
+    <IOUContext.Provider
+      value={{ ious, loading, error, refresh, addIou, togglePaid, removeIou }}
+    >
       {children}
     </IOUContext.Provider>
   );
