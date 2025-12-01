@@ -1,6 +1,6 @@
-// app/layout.tsx
 import "./globals.css";
 import type { ReactNode } from "react";
+
 import PiProvider from "@/components/PiProvider";
 import IOUProvider from "@/components/providers/IOUProvider";
 
@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-900 text-white">
+      <body>
         <PiProvider>
           <IOUProvider>
             {children}
