@@ -44,95 +44,98 @@ export default function AddIOUForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* TYPE */}
-      <div className="flex gap-2 rounded-2xl bg-gray-50 p-1">
+      <div className="flex gap-3">
         <button
           type="button"
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+          className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
             type === "owed"
-              ? "bg-emerald-500 text-white shadow-sm"
-              : "bg-gray-500 text-gray-600 hover:bg-gray-100"
+              ? "bg-emerald-500 text-white shadow"
+              : "bg-gray-600 text-gray-300"
           }`}
           onClick={() => setType("owed")}
         >
           <span className="font-black">me</span>
-          <br />
-          they owe <span className="font-black">me</span>
+          <br />they owe me
         </button>
 
         <button
           type="button"
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+          className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
             type === "owing"
-              ? "bg-amber-500 text-white shadow-sm"
-              : "bg-gray-500 text-gray-600 hover:bg-gray-100"
+              ? "bg-orange-500 text-white shadow"
+              : "bg-gray-600 text-gray-300"
           }`}
           onClick={() => setType("owing")}
         >
-          I owe <span className="font-black">them</span>
+          <span className="font-black">I owe them</span>
         </button>
       </div>
 
       {/* NAME */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Name</label>
+      <div>
+        <label className="text-sm font-medium text-gray-300">Name</label>
         <input
-          className="border border-gray-200 focus:border-transparent focus:ring-2 focus:ring-blue-500/60 rounded-xl px-3 py-2.5 w-full text-sm shadow-sm bg-white"
+          type="text"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Person or contact name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
 
-      {/* AMOUNT + CATEGORY */}
-      <div className="grid grid-cols-[2fr,1.4fr] gap-3">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Amount</label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            className="border border-gray-200 focus:border-transparent focus:ring-2 focus:ring-blue-500/60 rounded-xl px-3 py-2.5 w-full text-sm shadow-sm bg-white"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-        </div>
+      {/* AMOUNT */}
+      <div>
+        <label className="text-sm font-medium text-gray-300">Amount</label>
+        <input
+          type="number"
+          step="0.01"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="0.00"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </div>
 
-        {/* CURRENCY */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Currency</label>
-          <div className="flex rounded-xl bg-gray-50 p-1 text-xs font-semibold">
-            {(["EUR", "USD", "PI"] as IOUCurrency[]).map((cur) => (
-              <button
-                key={cur}
-                type="button"
-                className={`flex-1 py-1.5 rounded-lg transition-all ${
-                  currency === cur
-                    ? "bg-white shadow-sm text-gray-900"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-                onClick={() => setCurrency(cur)}
-              >
-                {CURRENCY_LABELS[cur].split(" ")[0]}
-              </button>
-            ))}
-          </div>
+      {/* CURRENCY */}
+      <div>
+        <label className="text-sm font-medium text-gray-300">Currency</label>
+
+        <div className="flex gap-2">
+          {(["EUR", "USD", "PI"] as IOUCurrency[]).map((cur) => (
+            <button
+              key={cur}
+              type="button"
+              className={`flex-1 py-3 rounded-xl transition-all ${
+                currency === cur
+                  ? "bg-blue-600 text-white shadow"
+                  : "bg-gray-700 text-gray-300"
+              }`}
+              onClick={() => setCurrency(cur)}
+            >
+              {CURRENCY_LABELS[cur].split(" ")[0]}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* CATEGORY */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Category</label>
+      <div>
+        <label className="text-sm font-medium text-gray-300">Category</label>
+
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                category === cat
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
-                  : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+                cat === category
+                  ? "bg-blue-500 text-white border-blue-600"
+                  : "bg-gray-700 text-gray-300 border-gray-600"
               }`}
               onClick={() => setCategory(cat)}
             >
@@ -144,7 +147,9 @@ export default function AddIOUForm() {
 
       {/* SUBMIT */}
       <button
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold text-sm tracking-wide shadow-md shadow-blue-500/20 transition-all"
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold 
+                   shadow-md transition-all"
       >
         Add IOU
       </button>
