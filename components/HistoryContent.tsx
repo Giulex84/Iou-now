@@ -1,12 +1,12 @@
 "use client";
 
-import { useIOUs } from "@/components/providers/IOUProvider";
+import { useIOUS } from "@/components/providers/IOUProvider";
 import IouCard from "@/components/IouCard";
 
 export default function HistoryContent() {
-  const { ious } = useIOUs();
+  const { ious } = useIOUS();
 
-  if (!ious || ious.length === 0) {
+  if (ious.length === 0) {
     return (
       <p className="text-gray-400 text-lg">
         Nessun IOU registrato.
