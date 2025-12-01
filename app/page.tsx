@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Page() {
   return (
     <div className="min-h-screen p-4 bg-gray-900 text-white space-y-6">
-      <h1 className="text-3xl font-bold mb-2">IOU Ledger</h1>
+      <h1 className="text-3xl font-bold mb-2">IOU</h1>
       <p className="mb-6">
         Benvenuto! Usa il menu per aggiungere e vedere IOU.
       </p>
