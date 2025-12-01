@@ -1,36 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { paymentId, txid } = await req.json();
-
-    const apiKey = process.env.PI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ ok: false, error: "PI_API_KEY missing" }, { status: 500 });
-    }
+    const { paymentId, txid, serverPaymentId } = await req.json();
 
     if (!paymentId || !txid) {
-      return NextResponse.json({ ok: false, error: "paymentId and txid required" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "paymentId and txid required" },
+        { status: 400 }
+      );
     }
 
-    const res = await fetch(`https://sandbox-api.minepi.com/v2/payments/${paymentId}/complete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Key ${apiKey}`,
-      },
-      body: JSON.stringify({ txid }),
-    });
+    console.log("COMPLETED:", { paymentId, txid, serverPaymentId });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json({ ok: false, error: data }, { status: 500 });
-    }
-
-    return NextResponse.json({ ok: true, payment: data });
-
+    return NextResponse.json({ ok: true });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
