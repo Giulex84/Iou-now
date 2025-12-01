@@ -1,32 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useIOUs } from "@/components/providers/IOUProvider";
-import type { IOUCurrency, IOUType } from "@/lib/types";
+import { useIOUS } from "@/components/providers/IOUProvider";
 
 const CATEGORIES = ["Prestito", "Cena", "Spesa", "Regalo", "Altro"] as const;
-
-const CURRENCY_LABELS: Record<IOUCurrency, string> = {
-  EUR: "€ Euro",
-  USD: "$ Dollar",
-  PI: "π Pi",
-};
+const CURRENCY_LABELS = { EUR: "€ Euro", USD: "$ Dollar", PI: "π Pi" };
 
 export default function AddIOUForm() {
-  const { addIOU } = useIOUs();
+  const { addIOU } = useIOUS();
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
-  const [type, setType] = useState<IOUType>("owed");
-  const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Prestito");
-  const [currency, setCurrency] = useState<IOUCurrency>("EUR");
+  const [type, setType] = useState<"owed" | "owing">("owed");
+  const [category, setCategory] = useState<string>("Prestito");
+  const [currency, setCurrency] = useState<"EUR" | "USD" | "PI">("EUR");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     if (!name || !amount) return;
 
-    await addIOU({
+    addIOU({
       name,
       amount: Number(amount),
       date: new Date().toISOString(),
@@ -79,8 +72,7 @@ export default function AddIOUForm() {
         <label className="text-sm font-medium text-gray-300">Name</label>
         <input
           type="text"
-          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
-                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
           placeholder="Person or contact name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -93,8 +85,7 @@ export default function AddIOUForm() {
         <input
           type="number"
           step="0.01"
-          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300
-                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 rounded-xl bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
@@ -104,9 +95,8 @@ export default function AddIOUForm() {
       {/* CURRENCY */}
       <div>
         <label className="text-sm font-medium text-gray-300">Currency</label>
-
         <div className="flex gap-2">
-          {(["EUR", "USD", "PI"] as IOUCurrency[]).map((cur) => (
+          {(["EUR", "USD", "PI"] as const).map((cur) => (
             <button
               key={cur}
               type="button"
@@ -126,13 +116,12 @@ export default function AddIOUForm() {
       {/* CATEGORY */}
       <div>
         <label className="text-sm font-medium text-gray-300">Category</label>
-
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
-              className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+              className={`px-4 py-2 rounded-full text-xs border transition-all ${
                 cat === category
                   ? "bg-blue-500 text-white border-blue-600"
                   : "bg-gray-700 text-gray-300 border-gray-600"
@@ -148,8 +137,7 @@ export default function AddIOUForm() {
       {/* SUBMIT */}
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold 
-                   shadow-md transition-all"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold shadow-md transition-all"
       >
         Add IOU
       </button>
