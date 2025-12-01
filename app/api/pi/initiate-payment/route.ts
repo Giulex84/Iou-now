@@ -4,8 +4,7 @@ export async function POST(req: Request) {
   try {
     const { amount, memo, metadata } = await req.json();
 
-    // Questo server NON parla con Pi.
-    // Genera solo un ID interno che il client userà nel Pi SDK.
+    // Genera un ID locale usato solo dal server
     const serverPaymentId = "SP_" + Math.random().toString(36).substring(2, 12);
 
     return NextResponse.json({
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
     });
   } catch (err: any) {
     return NextResponse.json(
-      { ok: false, error: err.message || "server failure" },
+      { ok: false, error: err.message },
       { status: 500 }
     );
   }
