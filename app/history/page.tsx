@@ -1,64 +1,65 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getIous, deleteIou } from "@/lib/ious";
-import type { IOU } from "@/lib/types";
+import { getIOUS, deleteIOU } from "@/lib/ious";
 
 export default function HistoryPage() {
-  const [ious, setIous] = useState<IOU[]>([]);
+  const [ious, setIOUS] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadData() {
+  async function loadIOUS() {
     setLoading(true);
-    const data = await getIous();
-    setIous(data);
+    const data = await getIOUS();
+    setIOUS(data);
     setLoading(false);
   }
 
-  async function handleDelete(id: string) {
-    await deleteIou(id);
-    await loadData();
-  }
-
   useEffect(() => {
-    loadData();
+    loadIOUS();
   }, []);
 
-  return (
-    <div className="p-6 space-y-6 text-white bg-[#0f172a] min-h-screen">
-      <h1 className="text-3xl font-bold text-white">Storico IOUs</h1>
+  async function handleDelete(id: string) {
+    if (!confirm("Sei sicuro di voler eliminare questo IOU?")) return;
 
-      {loading && <p className="text-gray-400 text-lg">Caricamento...</p>}
+    await deleteIOU(id);
+    await loadIOUS(); // ricarica la lista aggiornata
+  }
+
+  return (
+    <div className="p-4 max-w-lg mx-auto">
+      <h1 className="text-2xl font-bold text-blue-300 mb-4">History</h1>
+
+      {loading && <p className="text-gray-300">Caricamento...</p>}
 
       {!loading && ious.length === 0 && (
-        <p className="text-gray-400 text-lg">Nessun IOU registrato.</p>
+        <p className="text-gray-400">Nessun IOU presente.</p>
       )}
 
-      <div className="space-y-4">
+      <ul className="space-y-3">
         {ious.map((iou) => (
-          <div
+          <li
             key={iou.id}
-            className="bg-gray-800 p-4 rounded-xl shadow flex justify-between items-center"
+            className="bg-slate-800 p-4 rounded-lg flex justify-between items-center"
           >
             <div>
-              <p className="text-white font-semibold">{iou.title}</p>
-              <p className="text-gray-300 text-sm">
-                {iou.amount} — {iou.debtor}
+              <p className="text-white font-semibold">
+                {iou.debtor} → {iou.creditor}
               </p>
-              <p className="text-gray-400 text-xs">
-                {new Date(iou.date).toLocaleDateString("it-IT")}
-              </p>
+              <p className="text-blue-300">{iou.amount} π</p>
+              {iou.description && (
+                <p className="text-gray-400 text-sm mt-1">{iou.description}</p>
+              )}
             </div>
 
             <button
               onClick={() => handleDelete(iou.id)}
-              className="px-3 py-1 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700"
+              className="text-red-400 hover:text-red-300 font-bold text-sm"
             >
               Elimina
             </button>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
