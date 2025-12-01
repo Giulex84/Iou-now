@@ -4,63 +4,54 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
 } from "react";
 
-interface IOU {
+export interface IOU {
   id: string;
   name: string;
   amount: number;
   date: string;
   paid: boolean;
-  type: string;
+  type: "owed" | "owing";
   category: string;
-  currency: string;
-  description?: string;
+  currency: "EUR" | "USD" | "PI";
 }
 
 interface IOUContextType {
   ious: IOU[];
   addIOU: (iou: Omit<IOU, "id">) => void;
+  togglePaid: (id: string) => void;
 }
 
 const IOUContext = createContext<IOUContextType | undefined>(undefined);
 
-export const useIOUS = () => {
+export const useIOUS = (): IOUContextType => {
   const ctx = useContext(IOUContext);
-  if (!ctx) throw new Error("useIOUS deve essere usato dentro IOUProvider");
+  if (!ctx) throw new Error("useIOUS must be used inside IOUProvider");
   return ctx;
 };
 
 export default function IOUProvider({ children }: { children: ReactNode }) {
   const [ious, setIous] = useState<IOU[]>([]);
 
-  // 🔥 Carica IOUs da localStorage:
-  useEffect(() => {
-    const saved = localStorage.getItem("ious");
-    if (saved) {
-      try {
-        setIous(JSON.parse(saved));
-      } catch {}
-    }
-  }, []);
-
-  // 🔥 Salva ogni modifica
-  useEffect(() => {
-    localStorage.setItem("ious", JSON.stringify(ious));
-  }, [ious]);
-
   const addIOU = (iou: Omit<IOU, "id">) => {
-    const newIOU: IOU = {
-      ...iou,
-      id: Date.now().toString(),
-    };
-    setIous((prev) => [...prev, newIOU]);
+    setIous((prev) => [
+      ...prev,
+      { ...iou, id: Date.now().toString() },
+    ]);
+  };
+
+  const togglePaid = (id: string) => {
+    setIous((prev) =>
+      prev.map((iou) =>
+        iou.id === id ? { ...iou, paid: !iou.paid } : iou
+      )
+    );
   };
 
   return (
-    <IOUContext.Provider value={{ ious, addIOU }}>
+    <IOUContext.Provider value={{ ious, addIOU, togglePaid }}>
       {children}
     </IOUContext.Provider>
   );
