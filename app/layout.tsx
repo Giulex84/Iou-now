@@ -6,7 +6,7 @@ import IOUProvider from "@/components/providers/IOUProvider";
 
 export const metadata = {
   title: "IOU",
-  description: "Manage your IOUs with Pi Network",
+  description: "Track and manage your IOUs across currencies.",
 };
 
 export default function RootLayout({
