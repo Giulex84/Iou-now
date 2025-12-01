@@ -6,6 +6,7 @@ import { usePi } from "@/components/PiProvider";
 export default function StartPaymentButton() {
   const { Pi, user, initialized } = usePi();
   const [status, setStatus] = useState<string>("Pronto per il test payment.");
+  const [serverPaymentId, setServerPaymentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
@@ -16,35 +17,80 @@ export default function StartPaymentButton() {
 
     try {
       setIsLoading(true);
-      setStatus("Creazione pagamento...");
+      setStatus("Creo pagamento sul server...");
 
+      // 1️⃣ CREA IL PAGAMENTO SUL SERVER
+      const initRes = await fetch("/api/pi/initiate-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: 1,
+          memo: "Test payment (IOU)",
+          metadata: { reason: "test_payment" },
+        }),
+      });
+
+      const initJson = await initRes.json();
+
+      if (!initRes.ok || !initJson.ok) {
+        console.error("Errore initiate-payment:", initJson);
+        setStatus(`Errore initiate-payment: ${JSON.stringify(initJson)}`);
+        setIsLoading(false);
+        return;
+      }
+
+      const newServerPaymentId = initJson.serverPaymentId;
+      setServerPaymentId(newServerPaymentId);
+
+      // DATI DA MANDARE AL PI SDK
       const paymentData = {
         amount: 1,
-        memo: "Test payment (checklist)",
-        metadata: { reason: "checklist_test" },
+        memo: "Test payment (IOU)",
+        metadata: { serverPaymentId: newServerPaymentId },
       };
 
-      await Pi.createPayment(paymentData, {
+      // CALLBACKS PI SDK
+      const callbacks = {
         onReadyForServerApproval: async (paymentId: string) => {
-          setStatus("Approvazione automatica...");
-          try {
-            await Pi.approvePayment(paymentId); // APPROVA
-            setStatus("Approvato! Attesa completamento...");
-          } catch (e) {
-            setStatus("Errore approvazione server");
-            setIsLoading(false);
+          console.log("➡️ onReadyForServerApproval", paymentId);
+          setStatus("Server: approvazione in corso...");
+
+          const res = await fetch("/api/pi/approve-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paymentId,
+            }),
+          });
+
+          const json = await res.json();
+          if (!res.ok || !json.ok) {
+            console.error("Errore approvazione:", json);
+            setStatus("Errore durante l'approvazione del pagamento.");
+          } else {
+            setStatus("Approvato! Attesa completamento su Pi...");
           }
         },
 
         onReadyForServerCompletion: async (paymentId: string, txid: string) => {
-          setStatus("Completamento automatico...");
-          try {
-            await Pi.completePayment(paymentId, txid); // COMPLETA
-            setStatus("Pagamento completato! ✅");
-            alert("Test payment completato!");
-          } catch (e) {
-            setStatus("Errore completamento server");
+          console.log("➡️ onReadyForServerCompletion", paymentId, txid);
+          setStatus("Completamento sul server...");
+
+          const res = await fetch("/api/pi/complete-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentId, txid }),
+          });
+
+          const json = await res.json();
+          if (!res.ok || !json.ok) {
+            console.error("Errore completion:", json);
+            setStatus("Errore durante il completamento.");
+          } else {
+            setStatus("Pagamento completato ✅");
+            alert("Pagamento di test completato!");
           }
+
           setIsLoading(false);
         },
 
@@ -54,11 +100,14 @@ export default function StartPaymentButton() {
         },
 
         onError: (err: any) => {
-          console.error("Pi payment error", err);
+          console.error("❌ Errore Pi:", err);
           setStatus("Errore pagamento.");
           setIsLoading(false);
         },
-      });
+      };
+
+      // 2️⃣ AVVIA IL PAGAMENTO NEL PI SDK
+      await Pi.createPayment(paymentData, callbacks);
     } catch (err: any) {
       console.error("handlePayment error", err);
       setStatus("Errore: " + (err?.message ?? "sconosciuto"));
@@ -77,6 +126,13 @@ export default function StartPaymentButton() {
       {user && (
         <p className="text-xs mb-1">
           Utente: <span className="font-mono">{user.username}</span>
+        </p>
+      )}
+
+      {serverPaymentId && (
+        <p className="text-[10px] text-gray-400 mb-1">
+          serverPaymentId:{" "}
+          <span className="font-mono break-all">{serverPaymentId}</span>
         </p>
       )}
 
