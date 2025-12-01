@@ -20,11 +20,11 @@ export default function StartPaymentButton() {
       setIsLoading(true);
       setStatus("Creo pagamento sul server...");
 
+      // 🔥 MOSTRA ERRORE REALE DELL'API BACKEND
       const initRes = await fetch("/api/pi/initiate-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          iouId: "TEST_PAYMENT",
           amount: 1,
           memo: "Test payment (checklist)",
           metadata: { reason: "checklist_test" },
@@ -32,13 +32,22 @@ export default function StartPaymentButton() {
       });
 
       const initJson = await initRes.json();
-      if (!initRes.ok || !initJson.ok) {
-        setStatus("Errore initiate-payment");
+      console.log("Init response:", initJson);
+
+      if (!initRes.ok) {
+        setStatus(`Errore initiate-payment: ${JSON.stringify(initJson)}`);
         setIsLoading(false);
         return;
       }
 
-      const newServerPaymentId: string = initJson.serverPaymentId;
+      const newServerPaymentId: string = initJson.serverPaymentId ?? initJson.id;
+
+      if (!newServerPaymentId) {
+        setStatus("Errore: serverPaymentId mancante!");
+        setIsLoading(false);
+        return;
+      }
+
       setServerPaymentId(newServerPaymentId);
 
       const paymentData = {
@@ -61,8 +70,12 @@ export default function StartPaymentButton() {
           });
 
           const json = await res.json();
-          if (!res.ok || !json.ok) {
-            setStatus("Errore approvazione server");
+          console.log("Approve response:", json);
+
+          if (!res.ok) {
+            setStatus(
+              `Errore approvazione server: ${JSON.stringify(json)}`
+            );
           } else {
             setStatus("Approvato. Attesa completamento su Pi...");
           }
@@ -82,8 +95,12 @@ export default function StartPaymentButton() {
           });
 
           const json = await res.json();
-          if (!res.ok || !json.ok) {
-            setStatus("Errore completamento server");
+          console.log("Complete response:", json);
+
+          if (!res.ok) {
+            setStatus(
+              `Errore completamento server: ${JSON.stringify(json)}`
+            );
           } else {
             setStatus("Pagamento completato ✅");
             alert("Pagamento di test completato!");
@@ -99,7 +116,7 @@ export default function StartPaymentButton() {
 
         onError: (err: any) => {
           console.error("Pi payment error", err);
-          setStatus("Errore pagamento");
+          setStatus(`Errore pagamento: ${err?.message ?? "sconosciuto"}`);
           setIsLoading(false);
         },
       };
