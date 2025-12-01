@@ -5,7 +5,7 @@ import PiProvider from "@/components/PiProvider";
 import IOUProvider from "@/components/providers/IOUProvider";
 
 export const metadata = {
-  title: "IOU Now",
+  title: "IOU",
   description: "Manage your IOUs with Pi Network",
 };
 
