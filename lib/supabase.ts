@@ -1,6 +1,8 @@
+// lib/supabase.ts
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://rzuqmabjuululhhnnhagh.supabase.co";
-const supabaseAnonKey = "sb_publishable_VBZXwIi_8YCEYO8i1OZalA_FBJ6SE4S";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+// Client condiviso per tutta l'app
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
