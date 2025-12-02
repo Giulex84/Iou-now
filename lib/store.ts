@@ -1,46 +1,51 @@
-// lib/store.ts
-import { create } from "zustand";
-import { supabase } from "./supabase";
+"use client";
 
-export type IOU = {
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+type IOU = {
   id: string;
   title: string;
   amount: number;
+  currency: string;
   debtor: string;
-  created_at: string;
 };
 
-type State = {
+type StoreState = {
+  currency: string;
+  setCurrency: (c: string) => void;
+
   ious: IOU[];
-  fetchIOUs: () => Promise<void>;
-  addIOU: (iou: Omit<IOU, "id" | "created_at">) => Promise<void>;
-  deleteIOU: (id: string) => Promise<void>;
+  setIous: (list: IOU[]) => void;
+
+  deleteIou: (id: string) => void;
 };
 
-export const useIOUStore = create<State>((set, get) => ({
-  ious: [],
+export const useStore = create<StoreState>()(
+  persist(
+    (set) => ({
+      currency: "π Pi",
+      setCurrency: (c) => set({ currency: c }),
 
-  fetchIOUs: async () => {
-    const { data } = await supabase
-      .from("ious")
-      .select("*")
-      .order("created_at", { ascending: false });
+      ious: [],
+      setIous: (list) => set({ ious: list }),
 
-    set({ ious: data || [] });
-  },
+      deleteIou: (id) =>
+        set((state) => ({
+          ious: state.ious.filter((iou) => iou.id !== id),
+        })),
+    }),
 
-  addIOU: async (iou) => {
-    const { data } = await supabase
-      .from("ious")
-      .insert(iou)
-      .select()
-      .single();
-
-    set({ ious: [data, ...get().ious] });
-  },
-
-  deleteIOU: async (id) => {
-    await supabase.from("ious").delete().eq("id", id);
-    set({ ious: get().ious.filter((x) => x.id !== id) });
-  },
-}));
+    {
+      name: "iou-storage",
+      storage: createJSONStorage(() => {
+        if (typeof window !== "undefined") return window.localStorage;
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
+    }
+  )
+);
