@@ -1,28 +1,52 @@
 import { supabase } from "./supabase";
+import type { IOU } from "./types";
 
-export async function getIous() {
-  const { data } = await supabase.from("ious").select("*").order("created_at", { ascending: false });
-  return data || [];
-}
+export async function getIous(): Promise<IOU[]> {
+  const { data, error } = await supabase
+    .from("ious")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-export async function addIou(iou: { person: string; amount: number; type: "owes_me" | "i_owe" }) {
-  await supabase.from("ious").insert(iou);
-}
-
-export async function deleteIou(id: string) {
-  await supabase.from("ious").delete().eq("id", id);
-}
-
-export async function getIousSummary() {
-  const items = await getIous();
-
-  let owedToMe = 0;
-  let iOwe = 0;
-
-  for (const i of items) {
-    if (i.type === "owes_me") owedToMe += i.amount;
-    else iOwe += i.amount;
+  if (error) {
+    console.error("Error loading IOUs", error);
+    throw new Error(error.message);
   }
 
-  return { owedToMe, iOwe };
+  return (data ?? []) as IOU[];
+}
+
+export async function addIou(input: {
+  title: string;
+  amount: number;
+  debtor: string;
+  date: string;
+  paid: boolean;
+}): Promise<IOU> {
+  const { data, error } = await supabase
+    .from("ious")
+    .insert({
+      title: input.title,
+      amount: input.amount,
+      debtor: input.debtor,
+      date: input.date,
+      paid: input.paid,
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Error creating IOU", error);
+    throw new Error(error.message);
+  }
+
+  return data as IOU;
+}
+
+export async function deleteIou(id: string): Promise<void> {
+  const { error } = await supabase.from("ious").delete().eq("id", id);
+
+  if (error) {
+    console.error("Error deleting IOU", error);
+    throw new Error(error.message);
+  }
 }
