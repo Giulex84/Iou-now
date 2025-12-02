@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useIOUStore } from "@/lib/store";
 import CurrencySelector from "@/components/CurrencySelector";
 import Link from "next/link";
@@ -11,18 +11,6 @@ export default function AddIOU() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [debtor, setDebtor] = useState("Me");
-
-  const [currency, setCurrency] = useState("PI");
-  const [symbol, setSymbol] = useState("π");
-
-  // ⭐ IMPORTANTISSIMO: leggere localStorage SOLO QUI
-  useEffect(() => {
-    const c = localStorage.getItem("currency") || "PI";
-    const sym = localStorage.getItem("currency_symbol") || "π";
-
-    setCurrency(c);
-    setSymbol(sym);
-  }, []);
 
   const submit = async () => {
     await addIOU({
@@ -50,7 +38,7 @@ export default function AddIOU() {
 
         <input
           className="w-full bg-[#141a35] text-white p-4 rounded-xl mb-4"
-          placeholder={`Amount (${symbol})`}
+          placeholder="Amount"
           onChange={(e) => setAmount(e.target.value)}
         />
 
