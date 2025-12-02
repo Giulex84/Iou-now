@@ -21,7 +21,7 @@ type StoreState = {
   deleteIou: (id: string) => void;
 };
 
-export const useStore = create<StoreState>()(
+export const useIOUStore = create<StoreState>()(
   persist(
     (set) => ({
       currency: "π Pi",
