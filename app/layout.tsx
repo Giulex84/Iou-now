@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "IOU",
-  description: "Traccia debiti e crediti in modo semplice.",
+  description: "Gestisci debiti e crediti facilmente.",
 };
 
 export default function RootLayout({
