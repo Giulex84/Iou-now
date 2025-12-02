@@ -29,7 +29,6 @@
     "@radix-ui/react-scroll-area": "latest",
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-separator": "latest",
-    "@radix-ui/react-slider": "latest",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-switch": "latest",
     "@radix-ui/react-tabs": "latest",
@@ -43,7 +42,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
-    "date-fns": "^4.1.0",
+    "date-fns": "^3.1.0",
     "embla-carousel-react": "^8.6.0",
     "firebase": "latest",
     "geist": "latest",
@@ -52,16 +51,18 @@
     "next": "15.2.4",
     "next-themes": "latest",
     "react": "19.0.0",
-    "react-day-picker": "latest",
     "react-dom": "19.0.0",
+    "react-day-picker": "latest",
     "react-hook-form": "latest",
     "react-resizable-panels": "latest",
     "recharts": "latest",
     "sonner": "latest",
     "tailwind-merge": "latest",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "latest",
-    "zod": "latest"
+    "uuid": "latest",
+    "zod": "latest",
+    
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/node": "^20",
