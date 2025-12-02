@@ -1,55 +1,125 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getIousSummary } from "@/lib/ious";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { getIous } from "@/lib/ious";
+import type { IOU } from "@/lib/types";
+
+type Currency = "EUR" | "USD" | "PI";
+
+function getCurrencySymbol(currency: Currency) {
+  if (currency === "USD") return "$";
+  if (currency === "PI") return "π";
+  return "€";
+}
 
 export default function HomePage() {
-  const [summary, setSummary] = useState<any>(null);
+  const [ious, setIous] = useState<IOU[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currency, setCurrency] = useState<Currency>("EUR");
 
   useEffect(() => {
-    getIousSummary().then(setSummary);
+    // load currency preference
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("iou_currency");
+      if (stored === "EUR" || stored === "USD" || stored === "PI") {
+        setCurrency(stored);
+      }
+    }
+
+    async function load() {
+      try {
+        setLoading(true);
+        const data = await getIous();
+        setIous(data);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
-  return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-4xl font-bold mb-2">IOU</h1>
-      <p className="text-gray-300 mb-6">Traccia debiti e crediti facilmente.</p>
+  const symbol = getCurrencySymbol(currency);
 
-      {!summary ? (
-        <p className="text-gray-400">Caricamento...</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-green-900/40 border border-green-700">
-            <p className="text-sm text-green-300">Mi devono</p>
-            <p className="text-2xl font-bold text-green-400">
-              {summary.owedToMe.toFixed(2)}
+  // amount > 0 = I owe, amount < 0 = they owe me
+  const owedToMe = ious
+    .filter((i) => !i.paid && Number(i.amount) < 0)
+    .reduce((sum, i) => sum + Math.abs(Number(i.amount || 0)), 0);
+
+  const iOwe = ious
+    .filter((i) => !i.paid && Number(i.amount) > 0)
+    .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+
+  return (
+    <div className="min-h-screen bg-[#050a1a] text-white p-6">
+      <header className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-4xl font-extrabold tracking-tight">IOU</h1>
+
+          <select
+            value={currency}
+            onChange={(e) => {
+              const value = e.target.value as Currency;
+              setCurrency(value);
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("iou_currency", value);
+              }
+            }}
+            className="bg-[#0b1024] border border-gray-700 rounded-lg px-3 py-1 text-sm"
+          >
+            <option value="EUR">€ EUR</option>
+            <option value="USD">$ USD</option>
+            <option value="PI">π Pi</option>
+          </select>
+        </div>
+
+        <p className="text-gray-300 text-base">
+          Track debts and credits easily.
+        </p>
+      </header>
+
+      <main className="space-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="p-5 rounded-2xl bg-emerald-900/40 border border-emerald-700">
+            <p className="text-sm text-emerald-300 mb-1">They owe me</p>
+            <p className="text-3xl font-extrabold text-emerald-400">
+              {symbol} {owedToMe.toFixed(2)}
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-yellow-900/40 border border-yellow-700">
-            <p className="text-sm text-yellow-300">Devo</p>
-            <p className="text-2xl font-bold text-yellow-400">
-              {summary.iOwe.toFixed(2)}
+          <div className="p-5 rounded-2xl bg-amber-900/40 border border-amber-700">
+            <p className="text-sm text-amber-300 mb-1">I owe</p>
+            <p className="text-3xl font-extrabold text-amber-400">
+              {symbol} {iOwe.toFixed(2)}
             </p>
           </div>
         </div>
-      )}
 
-      <div className="mt-6 text-center">
-        <a
-          href="/add"
-          className="block w-full bg-purple-600 hover:bg-purple-700 p-3 rounded-xl font-bold mt-4"
-        >
-          Aggiungi IOU
-        </a>
+        {loading && (
+          <p className="text-center text-gray-400 text-sm">Loading IOUs...</p>
+        )}
 
-        <a
-          href="/history"
-          className="block w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold mt-4"
-        >
-          Storico IOU
-        </a>
-      </div>
+        {!loading && ious.length === 0 && (
+          <p className="text-center text-gray-400 text-sm">
+            No IOUs yet. Add your first one!
+          </p>
+        )}
+
+        <div className="space-y-4 mt-4">
+          <Link href="/add" className="block">
+            <button className="w-full py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 font-semibold text-lg transition">
+              Add IOU
+            </button>
+          </Link>
+
+          <Link href="/history" className="block">
+            <button className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 font-semibold text-lg transition">
+              IOU History
+            </button>
+          </Link>
+        </div>
+      </main>
     </div>
   );
 }
