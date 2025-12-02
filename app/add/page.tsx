@@ -12,18 +12,16 @@ export default function AddIOU() {
   const [amount, setAmount] = useState("");
   const [debtor, setDebtor] = useState("Me");
 
-  const [currency, setCurrency] = useState("Pi");
+  const [currency, setCurrency] = useState("PI");
   const [symbol, setSymbol] = useState("π");
 
-  // SAFE ON CLIENT ONLY
+  // ⭐ IMPORTANTISSIMO: leggere localStorage SOLO QUI
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const c = localStorage.getItem("currency");
-      const s = localStorage.getItem("currency_symbol");
+    const c = localStorage.getItem("currency") || "PI";
+    const sym = localStorage.getItem("currency_symbol") || "π";
 
-      if (c) setCurrency(c);
-      if (s) setSymbol(s);
-    }
+    setCurrency(c);
+    setSymbol(sym);
   }, []);
 
   const submit = async () => {
@@ -68,7 +66,7 @@ export default function AddIOU() {
 
           <button
             className={`flex-1 p-3 rounded-xl ${
-              debtor === "Them" ? "bg-purple-600" : "bg-[#141a35]"
+              debtor !== "Me" ? "bg-purple-600" : "bg-[#141a35]"
             }`}
             onClick={() => setDebtor("Them")}
           >
