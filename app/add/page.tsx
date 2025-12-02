@@ -1,78 +1,109 @@
 "use client";
 
-import React, { useState } from "react";
-import { useIOUs } from "@/components/providers/IOUProvider";
+import { useState } from "react";
+import { addIou } from "@/lib/ious";
 
 export default function AddPage() {
-  const { addIou, loading, error } = useIOUs();
-
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState<number | "">("");
-  const [debtor, setDebtor] = useState("");
+  const [amount, setAmount] = useState("");
+  const [debtor, setDebtor] = useState(""); 
+  const [relation, setRelation] = useState("they-owe-me"); 
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: any) {
     e.preventDefault();
     if (!title || !amount || !debtor) return;
 
+    setLoading(true);
+
+    const numeric = Number(amount);
+
+    const finalAmount =
+      relation === "they-owe-me" ? numeric : -numeric;
+
     await addIou({
-      title,
-      amount: Number(amount),
-      debtor,
-      paid: false,
-      created_at: new Date().toISOString(),
       id: crypto.randomUUID(),
+      title,
+      amount: finalAmount,
+      name: debtor,
+      paid: false,
+      currency: "€",
+      date: new Date().toISOString(),
     });
+
+    setLoading(false);
 
     setTitle("");
     setAmount("");
     setDebtor("");
-  };
+  }
 
   return (
-    <div className="max-w-md mx-auto p-6 text-white">
-      <h1 className="text-2xl font-bold mb-4 text-center">Aggiungi IOU</h1>
+    <div className="min-h-screen bg-[#0f172a] text-white p-6 space-y-6">
+      <h1 className="text-3xl font-bold text-center">Aggiungi IOU</h1>
 
-      {error && <p className="text-red-500 text-center mb-3">{error}</p>}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
 
         <div>
-          <label className="block text-sm font-medium mb-1">Titolo</label>
+          <label className="block text-sm mb-1">Titolo</label>
           <input
-            type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border rounded px-3 py-2 bg-[#1e293b] border-gray-700"
-            placeholder="Es. Prestito, Cena, Biglietti..."
+            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
+            placeholder="Es. Prestito, Cena…"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Importo</label>
+          <label className="block text-sm mb-1">Importo</label>
           <input
-            type="number"
             value={amount}
-            onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
-            className="w-full border rounded px-3 py-2 bg-[#1e293b] border-gray-700"
-            placeholder="Es. 20"
+            onChange={(e) => setAmount(e.target.value)}
+            type="number"
+            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
+            placeholder="Es. 25"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Debitore</label>
+          <label className="block text-sm mb-1">Persona coinvolta</label>
           <input
-            type="text"
             value={debtor}
             onChange={(e) => setDebtor(e.target.value)}
-            className="w-full border rounded px-3 py-2 bg-[#1e293b] border-gray-700"
-            placeholder="Nome della persona"
+            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
+            placeholder="Nome"
           />
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium mb-1">Relazione</p>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="rel"
+              value="they-owe-me"
+              checked={relation === "they-owe-me"}
+              onChange={e => setRelation(e.target.value)}
+            />
+            Mi devono dei soldi
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="rel"
+              value="i-owe-them"
+              checked={relation === "i-owe-them"}
+              onChange={e => setRelation(e.target.value)}
+            />
+            Devo soldi a questa persona
+          </label>
         </div>
 
         <button
-          type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded font-semibold disabled:bg-gray-400"
+          className="w-full bg-blue-600 py-3 rounded-xl font-semibold text-white disabled:bg-gray-600"
         >
           {loading ? "Salvataggio..." : "Aggiungi IOU"}
         </button>
