@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIOUStore } from "@/lib/store";
 import CurrencySelector from "@/components/CurrencySelector";
 import Link from "next/link";
@@ -11,9 +11,15 @@ export default function AddIOU() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [debtor, setDebtor] = useState("Me");
+  const [currency, setCurrency] = useState("Pi");
+  const [symbol, setSymbol] = useState("π");
 
-  const currency = localStorage.getItem("currency") || "PI";
-  const symbol = localStorage.getItem("currency_symbol") || "π";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrency(localStorage.getItem("currency") || "Pi");
+      setSymbol(localStorage.getItem("currency_symbol") || "π");
+    }
+  }, []);
 
   const submit = async () => {
     await addIOU({
@@ -33,6 +39,7 @@ export default function AddIOU() {
       </div>
 
       <div className="mt-8">
+
         <input
           className="w-full bg-[#141a35] text-white p-4 rounded-xl mb-4"
           placeholder="Description"
@@ -57,7 +64,7 @@ export default function AddIOU() {
 
           <button
             className={`flex-1 p-3 rounded-xl ${
-              debtor !== "Me" ? "bg-purple-600" : "bg-[#141a35]"
+              debtor === "Them" ? "bg-purple-600" : "bg-[#141a35]"
             }`}
             onClick={() => setDebtor("Them")}
           >
