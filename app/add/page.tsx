@@ -11,13 +11,18 @@ export default function AddIOU() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [debtor, setDebtor] = useState("Me");
+
   const [currency, setCurrency] = useState("Pi");
   const [symbol, setSymbol] = useState("π");
 
+  // SAFE ON CLIENT ONLY
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setCurrency(localStorage.getItem("currency") || "Pi");
-      setSymbol(localStorage.getItem("currency_symbol") || "π");
+      const c = localStorage.getItem("currency");
+      const s = localStorage.getItem("currency_symbol");
+
+      if (c) setCurrency(c);
+      if (s) setSymbol(s);
     }
   }, []);
 
@@ -39,7 +44,6 @@ export default function AddIOU() {
       </div>
 
       <div className="mt-8">
-
         <input
           className="w-full bg-[#141a35] text-white p-4 rounded-xl mb-4"
           placeholder="Description"
