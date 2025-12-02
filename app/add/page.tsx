@@ -4,110 +4,52 @@ import { useState } from "react";
 import { addIou } from "@/lib/ious";
 
 export default function AddPage() {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [debtor, setDebtor] = useState(""); 
-  const [relation, setRelation] = useState("they-owe-me"); 
-  const [loading, setLoading] = useState(false);
+  const [person, setPerson] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [type, setType] = useState<"owes_me" | "i_owe">("owes_me");
 
-  async function handleSubmit(e: any) {
-    e.preventDefault();
-    if (!title || !amount || !debtor) return;
-
-    setLoading(true);
-
-    const numeric = Number(amount);
-
-    const finalAmount =
-      relation === "they-owe-me" ? numeric : -numeric;
-
-    await addIou({
-      id: crypto.randomUUID(),
-      title,
-      amount: finalAmount,
-      name: debtor,
-      paid: false,
-      currency: "€",
-      date: new Date().toISOString(),
-    });
-
-    setLoading(false);
-
-    setTitle("");
-    setAmount("");
-    setDebtor("");
-  }
+  const submit = async () => {
+    if (!person || !amount) return;
+    await addIou({ person, amount, type });
+    window.location.href = "/history";
+  };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-center">Aggiungi IOU</h1>
+    <div className="p-6 max-w-xl mx-auto">
+      <h1 className="text-3xl font-bold text-center mb-4">Aggiungi IOU</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+      <div className="space-y-4">
+        <input
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700"
+          placeholder="Nome"
+          value={person}
+          onChange={(e) => setPerson(e.target.value)}
+        />
 
-        <div>
-          <label className="block text-sm mb-1">Titolo</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
-            placeholder="Es. Prestito, Cena…"
-          />
-        </div>
+        <input
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700"
+          type="number"
+          placeholder="Importo"
+          value={amount}
+          onChange={(e) => setAmount(parseFloat(e.target.value))}
+        />
 
-        <div>
-          <label className="block text-sm mb-1">Importo</label>
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            type="number"
-            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
-            placeholder="Es. 25"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Persona coinvolta</label>
-          <input
-            value={debtor}
-            onChange={(e) => setDebtor(e.target.value)}
-            className="w-full bg-[#1e293b] border border-gray-700 p-3 rounded-xl"
-            placeholder="Nome"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm font-medium mb-1">Relazione</p>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="rel"
-              value="they-owe-me"
-              checked={relation === "they-owe-me"}
-              onChange={e => setRelation(e.target.value)}
-            />
-            Mi devono dei soldi
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="rel"
-              value="i-owe-them"
-              checked={relation === "i-owe-them"}
-              onChange={e => setRelation(e.target.value)}
-            />
-            Devo soldi a questa persona
-          </label>
-        </div>
+        <select
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700"
+          value={type}
+          onChange={(e) => setType(e.target.value as any)}
+        >
+          <option value="owes_me">Mi deve</option>
+          <option value="i_owe">Devo</option>
+        </select>
 
         <button
-          disabled={loading}
-          className="w-full bg-blue-600 py-3 rounded-xl font-semibold text-white disabled:bg-gray-600"
+          onClick={submit}
+          className="w-full bg-purple-600 hover:bg-purple-700 p-3 rounded-xl font-bold"
         >
-          {loading ? "Salvataggio..." : "Aggiungi IOU"}
+          Aggiungi
         </button>
-      </form>
+      </div>
     </div>
   );
 }
