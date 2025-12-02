@@ -14,10 +14,8 @@ type IOU = {
 type StoreState = {
   currency: string;
   setCurrency: (c: string) => void;
-
   ious: IOU[];
   setIous: (list: IOU[]) => void;
-
   deleteIou: (id: string) => void;
 };
 
@@ -38,14 +36,16 @@ export const useIOUStore = create<StoreState>()(
 
     {
       name: "iou-storage",
-      storage: createJSONStorage(() => {
-        if (typeof window !== "undefined") return window.localStorage;
-        return {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {},
-        };
-      }),
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined"
+          ? window.localStorage
+          : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+            }
+      ),
+      skipHydration: true, // <— evita errori SSR
     }
   )
 );
