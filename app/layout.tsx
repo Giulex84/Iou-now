@@ -1,27 +1,20 @@
+import type { Metadata } from "next";
 import "./globals.css";
-import type { ReactNode } from "react";
 
-import PiProvider from "@/components/PiProvider";
-import IOUProvider from "@/components/providers/IOUProvider";
-
-export const metadata = {
+export const metadata: Metadata = {
   title: "IOU",
-  description: "Track and manage your IOUs across currencies.",
+  description: "Traccia debiti e crediti in modo semplice.",
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <PiProvider>
-          <IOUProvider>
-            {children}
-          </IOUProvider>
-        </PiProvider>
+    <html lang="it">
+      <body className="bg-[#0f172a] text-white min-h-screen">
+        {children}
       </body>
     </html>
   );
