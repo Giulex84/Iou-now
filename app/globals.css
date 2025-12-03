@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* I tuoi stili globali personalizzati possono andare qui */
+/* Stili Globali Minimi (Sicuro) */
 html,
 body {
   margin: 0;
