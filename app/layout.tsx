@@ -1,5 +1,6 @@
 import './globals.css'; 
 import type { Metadata } from 'next'; 
+import React from 'react'; // Assicurati di importare React se usi hook o React.FC
 
 export const metadata: Metadata = {
   title: 'IOU Ledger',
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    // AGGIUNGI CLASSE 'dark' QUI E RIMUOVI IL DIV CONTENITORE CON CLASSI FISSE
+    // CLASSE 'dark' APPLICATA E IL DIV CONFLITTUALE RIMOSSO
     <html lang="it" className="dark"> 
       <body>
         {children}
