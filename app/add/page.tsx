@@ -1,78 +1,111 @@
-"use client";
+'use client'; 
 
-import { useState } from "react";
-import { useIOUStore } from "@/lib/store";
-import CurrencySelector from "@/components/CurrencySelector";
-import Link from "next/link";
+import React, { useState } from 'react';
+import { supabase } from '@/lib/supabase'; // Importazione dal tuo file lib/supabase.ts
 
-export default function AddIOU() {
-  const addIOU = useIOUStore((s) => s.addIOU);
+export default function AddIOUPage() {
+    const [title, setTitle] = useState(''); // Corrisponde alla colonna 'text' (Descrizione)
+    const [amount, setAmount] = useState(''); // Corrisponde alla colonna 'amount'
+    const [debtor, setDebtor] = useState(''); // Corrisponde alla colonna 'title' (Persona)
+    const [loading, setLoading] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [debtor, setDebtor] = useState("Me");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-  const submit = async () => {
-    await addIOU({
-      title,
-      amount: parseFloat(amount),
-      debtor,
-    });
+        const dataToInsert = {
+            text: title, // La descrizione (es. Cena, Prestito)
+            amount: parseFloat(amount), // Importo numerico
+            title: debtor, // La persona coinvolta (Debitore/Creditore)
+        };
 
-    window.location.href = "/";
-  };
+        const { error } = await supabase
+            .from('ious') // Tabella 'ious'
+            .insert([dataToInsert]);
 
-  return (
-    <main className="p-6 text-white bg-[#0d1227] min-h-screen">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-extrabold">Add IOU</h1>
-        <CurrencySelector />
-      </div>
+        setLoading(false);
 
-      <div className="mt-8">
-        <input
-          className="w-full bg-[#141a35] text-white p-4 rounded-xl mb-4"
-          placeholder="Description"
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        if (error) {
+            alert('Errore durante l\'aggiunta dell\'IOU: ' + error.message);
+            console.error('Supabase Error:', error);
+        } else {
+            alert('IOU aggiunto con successo!');
+            // Pulizia dei campi dopo il salvataggio
+            setTitle('');
+            setAmount('');
+            setDebtor('');
+        }
+    };
 
-        <input
-          className="w-full bg-[#141a35] text-white p-4 rounded-xl mb-4"
-          placeholder="Amount"
-          onChange={(e) => setAmount(e.target.value)}
-        />
+    return (
+        <div className="min-h-screen bg-gray-900 text-white p-4">
+            <h1 className="text-3xl font-bold mb-8 text-center text-blue-400">
+                Aggiungi un Nuovo IOU
+            </h1>
 
-        <div className="flex gap-3 mb-4">
-          <button
-            className={`flex-1 p-3 rounded-xl ${
-              debtor === "Me" ? "bg-purple-600" : "bg-[#141a35]"
-            }`}
-            onClick={() => setDebtor("Me")}
-          >
-            I owe someone
-          </button>
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
+                
+                {/* Campo Titolo (Descrizione IOU) */}
+                <div>
+                    <label htmlFor="titolo" className="block text-sm font-medium text-gray-300 mb-2">
+                        Titolo (Descrizione)
+                    </label>
+                    <input
+                        id="titolo"
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Es. Prestito, Cena, Biglietti..."
+                        required
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 placeholder-gray-500 transition duration-200"
+                        disabled={loading}
+                    />
+                </div>
 
-          <button
-            className={`flex-1 p-3 rounded-xl ${
-              debtor !== "Me" ? "bg-purple-600" : "bg-[#141a35]"
-            }`}
-            onClick={() => setDebtor("Them")}
-          >
-            Someone owes me
-          </button>
+                {/* Campo Importo */}
+                <div>
+                    <label htmlFor="importo" className="block text-sm font-medium text-gray-300 mb-2">
+                        Importo (π)
+                    </label>
+                    <input
+                        id="importo"
+                        type="number"
+                        step="0.01"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Es. 20.50 (Usa numeri negativi se devi tu)"
+                        required
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 placeholder-gray-500 transition duration-200"
+                        disabled={loading}
+                    />
+                </div>
+
+                {/* Campo Debitore/Creditore (Persona) */}
+                <div>
+                    <label htmlFor="debitore" className="block text-sm font-medium text-gray-300 mb-2">
+                        Nome o Persona
+                    </label>
+                    <input
+                        id="debitore"
+                        type="text"
+                        value={debtor}
+                        onChange={(e) => setDebtor(e.target.value)}
+                        placeholder="Nome o persona"
+                        required
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 placeholder-gray-500 transition duration-200"
+                        disabled={loading}
+                    />
+                </div>
+
+                {/* Pulsante di Invio */}
+                <button
+                    type="submit"
+                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition duration-300 ease-in-out disabled:opacity-50"
+                    disabled={loading}
+                >
+                    {loading ? 'Aggiunta in corso...' : 'Aggiungi IOU'}
+                </button>
+            </form>
         </div>
-
-        <button
-          className="w-full bg-purple-600 py-4 rounded-xl text-xl"
-          onClick={submit}
-        >
-          Add IOU
-        </button>
-
-        <Link href="/" className="block mt-5 text-blue-300 underline">
-          ← Back to home
-        </Link>
-      </div>
-    </main>
-  );
+    );
 }
