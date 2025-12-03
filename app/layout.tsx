@@ -1,19 +1,23 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import './globals.css'; 
+
+// Importa i tipi Metadata da Next
+import type { Metadata } from 'next'; 
 
 export const metadata: Metadata = {
-  title: "IOU",
-  description: "Gestisci debiti e crediti facilmente.",
+  title: 'IOU Ledger',
+  description: 'Gestisci debiti e crediti facilmente.',
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="it">
-      <body className="bg-[#0f172a] text-white min-h-screen">
+    // AGGIUNGI LA CLASSE 'dark' QUI PER ABILITARE IL TEMA SCURO OVUNQUE
+    <html lang="it" className="dark"> 
+      <body>
+        {/* Rimuovi la classe bg-[#...] per lasciare che i componenti interni gestiscano lo sfondo */}
         {children}
       </body>
     </html>
